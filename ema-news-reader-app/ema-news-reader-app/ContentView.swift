@@ -20,6 +20,9 @@ struct ContentView: View {
     // @State give SwiftUI ownership of this changing value; it's temporary UI state, so a fresh app launch starts with .briefing again
     @State private var selectedTab: AppTab = .briefing
     
+    // @AppStorage connects a property to UserDefaults, Apple's storage for small preferences; brifing.showNews is the persistent storage key; true is the fallback when no preference has been saved
+    @AppStorage("briefing.showNews") private var showNews = true
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
@@ -66,17 +69,23 @@ struct ContentView: View {
                     Text("News, events and guidance will appear here.")
                         .foregroundStyle(.secondary)
                     
-                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: nil, isNew: true)
+                    Toggle("Show News in your briefing", isOn: $showNews)
                     
-                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
-                    
-                    NewsCard(category: "Human", title: "Sample news title for layout testing. Sample news title for layout testing. Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
-                    
-                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
-                    
-                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
-                    
-                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                    if showNews {
+                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: nil, isNew: true)
+                        
+                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
+                        
+                        NewsCard(category: "Human", title: "Sample news title for layout testing. Sample news title for layout testing. Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
+                        
+                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                        
+                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                        
+                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                    } else {
+                        Text("News Items are hidden and can be enabled above.")
+                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .topLeading)
