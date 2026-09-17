@@ -23,6 +23,9 @@ struct ContentView: View {
     // @AppStorage connects a property to UserDefaults, Apple's storage for small preferences; brifing.showNews is the persistent storage key; true is the fallback when no preference has been saved
     @AppStorage("briefing.showNews") private var showNews = true
     
+    @State private var isEditingBriefing = false
+    @State private var draftShowNews = true
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
@@ -69,8 +72,6 @@ struct ContentView: View {
                     Text("News, events and guidance will appear here.")
                         .foregroundStyle(.secondary)
                     
-                    Toggle("Show News in your briefing", isOn: $showNews)
-                    
                     if showNews {
                         NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: nil, isNew: true)
                         
@@ -84,7 +85,7 @@ struct ContentView: View {
                         
                         NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
                     } else {
-                        Text("News Items are hidden and can be enabled above.")
+                        Text("News is hidden. Tap Edit to show it in your briefing.")
                     }
                 }
                 .padding()
@@ -92,6 +93,44 @@ struct ContentView: View {
             }
             .background(Color.blue.opacity(0.08))
             .navigationTitle("Your Briefing")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit", systemImage: "slider.horizontal.3") {
+                        draftShowNews = showNews
+                        isEditingBriefing = true
+                    }
+                }
+            }
+            .sheet(isPresented: $isEditingBriefing) {
+                briefingEditor
+            }
+        }
+    }
+    
+    private var briefingEditor: some View {
+        NavigationStack {
+            Form {
+                Section("Sections") {
+                    Toggle("News", isOn: $draftShowNews)
+                }
+            }
+            .navigationTitle("Edit your briefing")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        isEditingBriefing = false
+                    }
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        // save the draft, then close
+                        showNews = draftShowNews
+                        isEditingBriefing = false
+                    }
+                }
+            }
         }
     }
 }
