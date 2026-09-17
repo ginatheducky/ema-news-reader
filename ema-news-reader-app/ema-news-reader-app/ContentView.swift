@@ -7,9 +7,56 @@
 
 import SwiftUI
 
-struct ContentView: View {
+enum AppTab: Hashable {
+    case news
+    case events
+    case briefing
+    case guidance
+    case media
+}
 
+
+struct ContentView: View {
+    // @State give SwiftUI ownership of this changing value; it's temporary UI state, so a fresh app launch starts with .briefing again
+    @State private var selectedTab: AppTab = .briefing
+    
     var body: some View {
+        TabView(selection: $selectedTab) {
+            Tab("News", systemImage: "newspaper", value: AppTab.news) {
+                NavigationStack {
+                    Text("News will appear here.")
+                        .navigationTitle(Text("News"))
+                }
+            }
+            
+            Tab("Events", systemImage: "calendar", value: AppTab.events) {
+                NavigationStack {
+                    Text("Events will appear here.")
+                        .navigationTitle(Text("Events"))
+                }
+            }
+            
+            Tab("Your Briefing", systemImage: "house", value: AppTab.briefing) {
+                briefingContent
+            }
+            
+            Tab("Guidance", systemImage: "book", value: AppTab.guidance) {
+                NavigationStack {
+                    Text("Guidance will appear here.")
+                        .navigationTitle(Text("Guidance"))
+                }
+            }
+            
+            Tab("Media", systemImage: "play.circle", value: AppTab.media) {
+                NavigationStack {
+                    Text("Youtube videos will be added in a later update.")
+                        .navigationTitle(Text("Media"))
+                }
+            }
+        }
+    }
+
+    private var briefingContent: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Your EMA overview")
