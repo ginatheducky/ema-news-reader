@@ -1,0 +1,9 @@
+ema-news-reader-app/.DS_Store
+ema-news-reader-app/xcuserdata/
+ema-news-reader-app/*.xcuserstate
+
+.DS_Store
+xcuserdata/
+*.xcuserstate
+
+*.af~lock~
