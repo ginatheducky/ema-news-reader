@@ -25,14 +25,14 @@ struct ContentView: View {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
                 NavigationStack {
                     Text("News will appear here.")
-                        .navigationTitle(Text("News"))
+                        .navigationTitle("News")
                 }
             }
             
             Tab("Events", systemImage: "calendar", value: AppTab.events) {
                 NavigationStack {
                     Text("Events will appear here.")
-                        .navigationTitle(Text("Events"))
+                        .navigationTitle("Events")
                 }
             }
             
@@ -43,14 +43,14 @@ struct ContentView: View {
             Tab("Guidance", systemImage: "book", value: AppTab.guidance) {
                 NavigationStack {
                     Text("Guidance will appear here.")
-                        .navigationTitle(Text("Guidance"))
+                        .navigationTitle("Guidance")
                 }
             }
             
             Tab("Media", systemImage: "play.circle", value: AppTab.media) {
                 NavigationStack {
-                    Text("Youtube videos will be added in a later update.")
-                        .navigationTitle(Text("Media"))
+                    Text("YouTube videos will be added in a later update.")
+                        .navigationTitle("Media")
                 }
             }
         }
