@@ -58,17 +58,30 @@ struct ContentView: View {
 
     private var briefingContent: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Your EMA overview")
-                    .font(.headline)
-                
-                Text("News, events and guidance will appear here.")
-                    .foregroundStyle(.secondary)
-                
-                NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Your EMA overview")
+                        .font(.headline)
+                    
+                    Text("News, events and guidance will appear here.")
+                        .foregroundStyle(.secondary)
+                    
+                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: nil, isNew: true)
+                    
+                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
+                    
+                    NewsCard(category: "Human", title: "Sample news title for layout testing. Sample news title for layout testing. Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
+                    
+                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                    
+                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                    
+                    NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(Color.blue.opacity(0.08))
             .navigationTitle("Your Briefing")
         }
     }
