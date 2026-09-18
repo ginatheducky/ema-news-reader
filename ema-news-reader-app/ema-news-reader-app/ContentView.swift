@@ -96,40 +96,22 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Edit", systemImage: "slider.horizontal.3") {
-                        draftShowNews = showNews
-                        isEditingBriefing = true
+                        draftShowNews = showNews // start editing from the users currently saved choice
+                        isEditingBriefing = true // opens the sheet
                     }
                 }
             }
             .sheet(isPresented: $isEditingBriefing) {
-                briefingEditor
-            }
-        }
-    }
-    
-    private var briefingEditor: some View {
-        NavigationStack {
-            Form {
-                Section("Sections") {
-                    Toggle("News", isOn: $draftShowNews)
-                }
-            }
-            .navigationTitle("Edit your briefing")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                BriefingEditor(
+                    draftShowNews: $draftShowNews,
+                    onCancel: {
                         isEditingBriefing = false
-                    }
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        // save the draft, then close
+                    },
+                    onSave: {
                         showNews = draftShowNews
                         isEditingBriefing = false
                     }
-                }
+                )
             }
         }
     }
