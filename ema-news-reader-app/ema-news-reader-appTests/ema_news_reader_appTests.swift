@@ -22,7 +22,8 @@ struct ema_news_reader_appTests {
                 "news_summary": "",
                 "categories": "Human; Veterinary; ;",
                 "topics": "Medicines; Innovation",
-                "news_url": "https://example.com/news/test-article"
+                "news_url": "https://example.com/news/test-article",
+                "first_published_date": "11/09/2026"
             }
         ]
     }
@@ -30,11 +31,9 @@ struct ema_news_reader_appTests {
         
         let bytes = Data(json.utf8)
         let feed = try JSONDecoder().decode(NewsFeed.self, from: bytes)
-        
         #expect(feed.data.count == 1)
         
         let article = try #require(feed.data.first)
-        
         #expect(article.title == "Test article")
         #expect(article.newsSummary == "")
         #expect(article.categoryValues == ["Human", "Veterinary"])
@@ -42,8 +41,18 @@ struct ema_news_reader_appTests {
         #expect(article.displaySummary == nil)
         
         let url = try #require(article.articleURL)
-        
         #expect(url.absoluteString == "https://example.com/news/test-article")
+        
+        let date = try #require(article.publicationDate)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        let components = calendar.dateComponents(
+            [.year, .month, .day],
+            from: date
+        )
+        #expect(components.year == 2026)
+        #expect(components.month == 9)
+        #expect(components.day == 11)
     }
     
     
@@ -54,7 +63,8 @@ struct ema_news_reader_appTests {
             newsSummary: "  \n",
             categories: "",
             topics:   "",
-            newsURL: raw
+            newsURL: raw,
+            firstPublishedDate: "11/09/2026"
         )
         
         #expect(article.articleURL == nil)
@@ -68,7 +78,8 @@ struct ema_news_reader_appTests {
             newsSummary: "",
             categories: raw,
             topics: raw,
-            newsURL: "https://example.com/news/test-article"
+            newsURL: "https://example.com/news/test-article",
+            firstPublishedDate: "11/09/2026"
         )
         
         #expect(article.categoryValues.isEmpty)
@@ -82,7 +93,8 @@ struct ema_news_reader_appTests {
         "news_summary": "",
         "categories": 42,
         "topics": "Medicines",
-        "news_url": "https://example.com/news/test-article"
+        "news_url": "https://example.com/news/test-article",
+        "first_published_date": "11/09/2026"
     }
     """
         
@@ -100,7 +112,8 @@ struct ema_news_reader_appTests {
             newsSummary: "  \n",
             categories: "",
             topics:   "",
-            newsURL: "https://example.com/news/test-article"
+            newsURL: "https://example.com/news/test-article",
+            firstPublishedDate: "11/09/2026"
         )
         
         #expect(article.displaySummary == nil)
@@ -112,10 +125,53 @@ struct ema_news_reader_appTests {
             newsSummary: "  Example Summary. ",
             categories: "",
             topics:   "",
-            newsURL: "https://example.com/news/test-article"
+            newsURL: "https://example.com/news/test-article",
+            firstPublishedDate: "11/09/2026"
         )
         
         #expect(article.displaySummary == "Example Summary.")
+    }
+    
+    @Test(arguments: ["", "31/02/2026", "2026-09-11"])
+    func rejectsInvalidPublicationDates(raw: String) {
+        let article = NewsRecord(
+            title: "Test article",
+            newsSummary: "",
+            categories: "",
+            topics: "",
+            newsURL: "https://example.com/news/test-article",
+            firstPublishedDate: raw
+        )
+        
+        #expect(article.publicationDate == nil)
+    }
+    
+    
+    @Test
+    func septemberPublicationIsLaterThanAugust() throws {
+        let articleAug = NewsRecord(
+            title: "Test article",
+            newsSummary: "",
+            categories: "",
+            topics: "",
+            newsURL: "https://example.com/news/test-article",
+            firstPublishedDate: "31/08/2026"
+        )
+        
+        let articleSep = NewsRecord(
+            title: "Test article",
+            newsSummary: "",
+            categories: "",
+            topics: "",
+            newsURL: "https://example.com/news/test-article",
+            firstPublishedDate: "01/09/2026"
+        )
+        
+        let dateAug = try #require(articleAug.publicationDate)
+        let dateSept = try #require(articleSep.publicationDate)
+        
+        #expect(dateAug < dateSept)
+
     }
 
 }

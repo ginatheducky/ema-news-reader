@@ -35,6 +35,7 @@ nonisolated struct NewsRecord: Decodable {
     let categories: String
     let topics: String
     let newsURL: String
+    let firstPublishedDate: String
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -42,6 +43,7 @@ nonisolated struct NewsRecord: Decodable {
         case categories = "categories"
         case topics = "topics"
         case newsURL = "news_url"
+        case firstPublishedDate = "first_published_date"
     }
     
     var categoryValues: [String] {
@@ -78,6 +80,22 @@ nonisolated struct NewsRecord: Decodable {
         }
         
         return url
+    }
+    
+    var publicationDate: Date? {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.isLenient = false
+        
+        guard let date = formatter.date(from: firstPublishedDate),
+              formatter.string(from: date) == firstPublishedDate else {
+            return nil
+        }
+        
+        return date
     }
 }
 
