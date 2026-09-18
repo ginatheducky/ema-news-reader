@@ -73,17 +73,28 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                     
                     if showNews {
+                        HStack {
+                            Text("Latest news")
+                                .font(.title2.bold())
+                                .accessibilityAddTraits(.isHeader)
+                            
+                            Spacer()
+                            
+                            Button {
+                                // select the news tab
+                                selectedTab = AppTab.news
+                            } label: {
+                                Label("See all", systemImage: "chevron.right")
+                                    .font(.subheadline)
+                                    .frame(minHeight: 44)
+                                    .contentShape(Rectangle())
+                            }
+                            .accessibilityLabel("See all news")
+                        }
+                        
                         NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: nil, isNew: true)
                         
                         NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
-                        
-                        NewsCard(category: "Human", title: "Sample news title for layout testing. Sample news title for layout testing. Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
-                        
-                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
-                        
-                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
-                        
-                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: false)
                     } else {
                         Text("News is hidden. Tap Edit to show it in your briefing.")
                     }
