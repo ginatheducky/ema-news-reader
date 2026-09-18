@@ -32,14 +32,16 @@ nonisolated struct NewsFeed: Decodable {
 nonisolated struct NewsRecord: Decodable {
     let title: String
     let newsSummary: String
-    var categories: String
-    var topics: String
+    let categories: String
+    let topics: String
+    let newsURL: String
     
     enum CodingKeys: String, CodingKey {
         case title
         case newsSummary = "news_summary"
         case categories = "categories"
         case topics = "topics"
+        case newsURL = "news_url"
     }
     
     var categoryValues: [String] {
@@ -47,6 +49,35 @@ nonisolated struct NewsRecord: Decodable {
             .split(separator: ";")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+    }
+    
+    var topicValues: [String] {
+        topics
+            .split(separator: ";")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+    
+    var displaySummary: String? {
+        let trimmed = newsSummary.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmed.isEmpty {
+            return nil
+        }
+        
+        return trimmed
+    }
+    
+    var articleURL: URL? {
+        guard let url = URL(string: newsURL),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "https" || scheme == "http",
+              let host = url.host,
+              !host.isEmpty else {
+            return nil
+        }
+        
+        return url
     }
 }
 
