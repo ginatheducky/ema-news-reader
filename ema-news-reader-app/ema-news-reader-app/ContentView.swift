@@ -29,10 +29,9 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
-                NavigationStack {
-                    Text("News will appear here.")
-                        .navigationTitle("News")
-                }
+                NewsView(
+                    articles: NewsFeed(data: NewsRecord.samples).newestFirst
+                )
             }
             
             Tab("Events", systemImage: "calendar", value: AppTab.events) {

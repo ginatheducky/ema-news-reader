@@ -173,5 +173,20 @@ struct ema_news_reader_appTests {
         #expect(dateAug < dateSept)
 
     }
+    
+    @Test func sortsNewsNewestFirst() {
+        let feed = NewsFeed(data: NewsRecord.samples)
+        
+        let titles = feed.newestFirst.map { article in
+            article.title
+        }
+        
+        #expect(titles == [
+            "Sample: September news",
+            "Sample: August news",
+            "Sample: Another year, July",
+            "Sample: Date unavailable"
+        ])
+    }
 
 }

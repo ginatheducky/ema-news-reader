@@ -27,6 +27,16 @@ import Foundation
 
 nonisolated struct NewsFeed: Decodable {
     let data: [NewsRecord]
+    
+    var newestFirst: [NewsRecord] {
+        let datedRecords = data.map { article in
+            (article: article, date: article.publicationDate ?? Date.distantPast)
+        }
+        
+        return datedRecords
+            .sorted { first, second in first.date > second.date }
+            .map { entry in entry.article }
+    }
 }
 
 nonisolated struct NewsRecord: Decodable {
@@ -100,4 +110,39 @@ nonisolated struct NewsRecord: Decodable {
 }
 
 
-
+extension NewsRecord {
+    static let samples: [NewsRecord] = [
+        NewsRecord(
+            title: "Sample: August news",
+            newsSummary: "Example content for testing the news screen.",
+            categories: "Human",
+            topics: "Medicines",
+            newsURL: "https://example.com/news/august",
+            firstPublishedDate: "31/08/2026"
+        ),
+        NewsRecord(
+            title: "Sample: September news",
+            newsSummary: "",
+            categories: "Human;Veterinary",
+            topics: "Innovation",
+            newsURL: "https://example.com/news/september",
+            firstPublishedDate: "01/09/2026"
+        ),
+        NewsRecord(
+            title: "Sample: Another year, July",
+            newsSummary: "",
+            categories: "Human;Veterinary",
+            topics: "Innovation",
+            newsURL: "https://example.com/news/July2025",
+            firstPublishedDate: "04/07/2025"
+        ),
+        NewsRecord(
+            title: "Sample: Date unavailable",
+            newsSummary: "",
+            categories: "Human;Veterinary",
+            topics: "Innovation",
+            newsURL: "https://example.com/news/unavailable",
+            firstPublishedDate: ""
+        )
+    ]
+}
