@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct NewsCard: View {
-    let category: String
     let title: String
-    let summary: String?
+    let category: [String]
+    let topics: [String]
     let isNew: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(category)
+                Text(category.joined(separator: " · "))
                     .font(.subheadline)
                     .foregroundStyle(.blue)
                 
@@ -32,9 +32,9 @@ struct NewsCard: View {
             Text(title)
                 .font(.headline)
             
-            if let summary {
-                Text(summary)
-                    .font(.subheadline)
+            if !topics.isEmpty {
+                Text("Topics: \(topics.joined(separator: " · "))")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
@@ -51,7 +51,14 @@ struct NewsCard: View {
 }
 
 #Preview("News card - sample") {
-    NewsCard(category: "Human", title: "Sample news title for layout testing", summary: "Sample summary used to check spacing and readability.", isNew: true)
+    let newsItem = NewsRecord.samples[1]
+    
+    NewsCard(
+        title: newsItem.title,
+        category: newsItem.categoryValues,
+        topics: newsItem.topicValues,
+        isNew: false
+    )
         .padding()
         .background(Color.blue.opacity(0.08))
 }

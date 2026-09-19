@@ -107,6 +107,16 @@ nonisolated struct NewsRecord: Decodable {
         
         return date
     }
+    
+    func matchesSearch(_ query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmed.isEmpty {
+            return true
+        }
+        
+        return title.localizedStandardContains(trimmed) || newsSummary.localizedStandardContains(trimmed)
+    }
 }
 
 
@@ -122,9 +132,9 @@ extension NewsRecord {
         ),
         NewsRecord(
             title: "Sample: September news",
-            newsSummary: "",
+            newsSummary: "Outcomes of the Committee for Veterinary Medicinal Products (CVMP) meeting",
             categories: "Human;Veterinary",
-            topics: "Innovation",
+            topics: "Innovation;Test",
             newsURL: "https://example.com/news/september",
             firstPublishedDate: "01/09/2026"
         ),

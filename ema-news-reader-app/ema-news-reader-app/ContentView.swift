@@ -91,9 +91,20 @@ struct ContentView: View {
                             .accessibilityLabel("See all news")
                         }
                         
-                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: nil, isNew: true)
+                        NewsCard(
+                            title: NewsRecord.samples[1].title,
+                            category: NewsRecord.samples[1].categoryValues,
+                            topics: NewsRecord.samples[1].topicValues,
+                            isNew: true
+                        )
                         
-                        NewsCard(category: "Human", title: "Sample news title for layout testing.", summary: "Sample summary used to check spacing and readability.", isNew: true)
+                        NewsCard(
+                            title: NewsRecord.samples[1].title,
+                            category: NewsRecord.samples[1].categoryValues,
+                            topics: NewsRecord.samples[1].topicValues,
+                            isNew: true
+                        )
+                        
                     } else {
                         Text("News is hidden. Tap Edit to show it in your briefing.")
                     }
