@@ -207,5 +207,41 @@ struct ema_news_reader_appTests {
         #expect(!article.matchesSearch("conference"))
         #expect(!article.matchesSearch("Veterinary"))
     }
+    
+    @Test func allModeRequiresEverySelectedCategory() {
+        let article = NewsRecord(
+            title: "Test article",
+            newsSummary: "",
+            categories: "Human;Veterinary",
+            topics: "",
+            newsURL: "https://example.com/news/matching-mode",
+            firstPublishedDate: "11/09/2026"
+        )
+        
+        #expect(article.matchesCategories(
+            ["Human", "Veterinary"],
+            mode: .all
+        ))
+        
+        #expect(!article.matchesCategories(
+            ["Human", "Corporate"],
+            mode: .all
+        ))
+        
+        #expect(article.matchesCategories(
+            ["Human", "Corporate"],
+            mode: .any
+        ))
+        
+        #expect(article.matchesCategories(
+            ["Human"],
+            mode: .all
+        ))
+        
+        #expect(article.matchesCategories(
+            [],
+            mode: .all
+        ))
+    }
 
 }

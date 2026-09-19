@@ -25,6 +25,11 @@
 
 import Foundation
 
+nonisolated enum CategoryMatchMode: String {
+    case any
+    case all
+}
+
 nonisolated struct NewsFeed: Decodable {
     let data: [NewsRecord]
     
@@ -36,6 +41,19 @@ nonisolated struct NewsFeed: Decodable {
         return datedRecords
             .sorted { first, second in first.date > second.date }
             .map { entry in entry.article }
+    }
+    
+    var availableCategories: [String] {
+//        [["Human"], ["Human", "Veterinary"]]
+//        ↓
+//        ["Human", "Human", "Veterinary"]
+//        ↓
+//        ["Human", "Veterinary"]
+        let values = data.flatMap { article in // flatMap gathers each articles category array into one flat array
+            article.categoryValues
+        }
+        
+        return Set(values).sorted() // Set removes duplicates and sorted gives the menu a predictable order
     }
 }
 
@@ -117,6 +135,21 @@ nonisolated struct NewsRecord: Decodable {
         
         return title.localizedStandardContains(trimmed) || newsSummary.localizedStandardContains(trimmed)
     }
+    
+    func matchesCategories(_ selected: Set<String>, mode: CategoryMatchMode = .any) -> Bool {
+        if selected.isEmpty {
+            return true
+        }
+        
+        switch mode {
+        case .any:
+            return categoryValues.contains { category in
+                selected.contains(category)
+            }
+        case .all:
+            return selected.isSubset(of: Set(categoryValues))
+        }
+    }
 }
 
 
@@ -141,7 +174,7 @@ extension NewsRecord {
         NewsRecord(
             title: "Sample: Another year, July",
             newsSummary: "",
-            categories: "Human;Veterinary",
+            categories: "Veterinary",
             topics: "Innovation",
             newsURL: "https://example.com/news/July2025",
             firstPublishedDate: "04/07/2025"
@@ -149,10 +182,18 @@ extension NewsRecord {
         NewsRecord(
             title: "Sample: Date unavailable",
             newsSummary: "",
-            categories: "Human;Veterinary",
+            categories: "Corporate",
             topics: "Innovation",
             newsURL: "https://example.com/news/unavailable",
             firstPublishedDate: ""
+        ),
+        NewsRecord(
+            title: "Sample: August2 news",
+            newsSummary: "Example content for testing the news screen.",
+            categories: "Human;Corporate",
+            topics: "Medicines",
+            newsURL: "https://example.com/news/august2",
+            firstPublishedDate: "15/08/2026"
         )
     ]
 }
