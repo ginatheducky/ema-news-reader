@@ -56,27 +56,61 @@ struct ContentView: View {
     
     private var briefingContent: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Your EMA overview")
-                    .font(.headline)
-                
-                Text("News, events and guidance will appear here.")
-                    .foregroundStyle(.secondary)
-                
-                NewsCard(
-                    title: "Sample news title for layout testing",
-                    summary: "Sample summary used to check spacing and readability.",
-                    category: "Human",
-                    isNew: true
-                )
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Your EMA overview")
+                        .font(.headline)
+                    
+                    Text("News, events and guidance will appear here.")
+                        .foregroundStyle(.secondary)
+                    
+                    NewsCard(
+                        title: "Sample news title for layout testing",
+                        summary: "Sample summary used to check spacing and readability.",
+                        category: "Human",
+                        isNew: true
+                    )
+                    
+                    NewsCard(
+                        title: "Sample news title for layout testing",
+                        summary: "Sample summary used to check spacing and readability.",
+                        category: "Human",
+                        isNew: true
+                    )
+                    
+                    NewsCard(
+                        title: "Sample news title for layout testing",
+                        summary: "Sample summary used to check spacing and readability.",
+                        category: "Human",
+                        isNew: true
+                    )
+                    
+                    NewsCard(
+                        title: "Sample news title for layout testing",
+                        summary: "Sample summary used to check spacing and readability.",
+                        category: "Human",
+                        isNew: true
+                    )
+                    
+                    NewsCard(
+                        title: "Sample news title for layout testing",
+                        summary: "Sample summary used to check spacing and readability.",
+                        category: "Human",
+                        isNew: true
+                    )
+                    
+                    NewsCard(
+                        title: "Sample news title for layout testing",
+                        summary: "Sample summary used to check spacing and readability.",
+                        category: "Human",
+                        isNew: true
+                    )
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .background(Color.blue.opacity(0.08))
+                .navigationTitle("Your Briefing")
             }
-            .padding()
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-                alignment: .topLeading
-            )
-            .navigationTitle("Your Briefing")
         }
     }
 
