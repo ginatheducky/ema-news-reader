@@ -104,33 +104,16 @@ struct ContentView: View {
                     }
                 }
                 .sheet(isPresented: $isEditingBriefing) {
-                    briefingEditor
-                }
-            }
-        }
-    }
-
-    private var briefingEditor: some View {
-        NavigationStack {
-            Form {
-                Section("Sections") {
-                    Toggle("News", isOn: $draftShowNews)
-                }
-            }
-            .navigationTitle("Edit your briefing")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        isEditingBriefing = false
-                    }
-                }
-                
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Save") {
-                        showNews = draftShowNews
-                        isEditingBriefing = false
-                    }
+                    BriefingEditor(
+                        draftShowNews: $draftShowNews,
+                        onCancel: {
+                            isEditingBriefing = false
+                        },
+                        onSave: {
+                            showNews = draftShowNews
+                            isEditingBriefing = false
+                        }
+                    )
                 }
             }
         }
