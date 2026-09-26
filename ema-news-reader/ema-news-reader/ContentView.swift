@@ -16,7 +16,11 @@ enum AppTab: Hashable {
 }
 
 struct ContentView: View {
+    @AppStorage("briefing.showNews") private var showNews = true
+    
     @State private var selectedTab: AppTab = .briefing
+    @State private var isEditingBriefing = false
+    @State private var draftShowNews = true
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -41,7 +45,7 @@ struct ContentView: View {
             Tab("Guidance", systemImage: "book", value: AppTab.guidance) {
                 NavigationStack {
                     Text("Guidance will appear here.")
-                        .navigationTitle("News")
+                        .navigationTitle("Guidance")
                 }
             }
             
@@ -64,113 +68,77 @@ struct ContentView: View {
                     Text("News, events and guidance will appear here.")
                         .foregroundStyle(.secondary)
                     
-                    NewsCard(
-                        title: "Sample news title for layout testing",
-                        summary: "Sample summary used to check spacing and readability.",
-                        category: "Human",
-                        isNew: true
-                    )
-                    
-                    NewsCard(
-                        title: "Sample news title for layout testing",
-                        summary: "Sample summary used to check spacing and readability.",
-                        category: "Human",
-                        isNew: true
-                    )
-                    
-                    NewsCard(
-                        title: "Sample news title for layout testing",
-                        summary: "Sample summary used to check spacing and readability.",
-                        category: "Human",
-                        isNew: true
-                    )
-                    
-                    NewsCard(
-                        title: "Sample news title for layout testing",
-                        summary: "Sample summary used to check spacing and readability.",
-                        category: "Human",
-                        isNew: true
-                    )
-                    
-                    NewsCard(
-                        title: "Sample news title for layout testing",
-                        summary: "Sample summary used to check spacing and readability.",
-                        category: "Human",
-                        isNew: true
-                    )
-                    
-                    NewsCard(
-                        title: "Sample news title for layout testing",
-                        summary: "Sample summary used to check spacing and readability.",
-                        category: "Human",
-                        isNew: true
-                    )
+                    if showNews {
+                        NewsCard(
+                            title: "Sample news title for layout testing",
+                            summary: "Sample summary used to check spacing and readability.",
+                            category: "Human",
+                            isNew: true
+                        )
+                        NewsCard(
+                            title: "Sample news title for layout testing",
+                            summary: "Sample summary used to check spacing and readability.",
+                            category: "Human",
+                            isNew: true
+                        )
+                        NewsCard(
+                            title: "Sample news title for layout testing",
+                            summary: "Sample summary used to check spacing and readability.",
+                            category: "Human",
+                            isNew: true
+                        )
+                    } else {
+                        Text("News is hidden, toggle button to show.")
+                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .background(Color.blue.opacity(0.08))
                 .navigationTitle("Your Briefing")
-            }
-        }
-    }
-
-    
-}
-
-struct NewsCard: View {
-    let title: String
-    let summary: String?
-    let category: String
-    let isNew: Bool
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(category)
-                    .font(.subheadline)
-                    .foregroundStyle(.blue)
-                
-                Spacer()
-                
-                if isNew {
-                    Text("NEW")
-                        .font(.caption.bold())
-                        .foregroundStyle(.blue)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Edit", systemImage: "slider.horizontal.3") {
+                            draftShowNews = showNews
+                            isEditingBriefing = true
+                        }
+                    }
+                }
+                .sheet(isPresented: $isEditingBriefing) {
+                    briefingEditor
                 }
             }
-            
-            Text(title)
-                .font(.headline)
-            
-            if let summary {
-                Text(summary)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+        }
+    }
+
+    private var briefingEditor: some View {
+        NavigationStack {
+            Form {
+                Section("Sections") {
+                    Toggle("News", isOn: $draftShowNews)
+                }
+            }
+            .navigationTitle("Edit your briefing")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        isEditingBriefing = false
+                    }
+                }
+                
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Save") {
+                        showNews = draftShowNews
+                        isEditingBriefing = false
+                    }
+                }
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.background, in: RoundedRectangle(cornerRadius: 16))
-        .overlay(alignment: .leading) {
-            Rectangle()
-                .fill(.blue)
-                .frame(width: 5)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
+
+
 
 #Preview {
     ContentView()
-}
-
-#Preview("News card — sample") {
-    NewsCard(
-        title: "Sample news title for layout testing",
-        summary: "Sample summary used to check spacing and readability.",
-        category: "Human",
-        isNew: true
-    )
-    .padding()
-    .background(Color.blue.opacity(0.08))
 }
