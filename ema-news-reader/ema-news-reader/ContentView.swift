@@ -69,6 +69,24 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                     
                     if showNews {
+                        HStack {
+                            Text("Latest news")
+                                .font(.title2.bold())
+                                .accessibilityAddTraits(.isHeader)
+                            
+                            Spacer()
+                            
+                            Button {
+                                selectedTab = AppTab.news
+                            } label: {
+                                Label("See all", systemImage: "chevron.right")
+                                    .font(.subheadline)
+                                    .frame(minHeight: 44)
+                                    .contentShape(Rectangle())
+                            }
+                            .accessibilityLabel("See all news")
+                        }
+                        
                         NewsCard(
                             title: "Sample news title for layout testing",
                             summary: "Sample summary used to check spacing and readability.",
