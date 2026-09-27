@@ -15,12 +15,17 @@ struct NewsView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(articles, id: \.newsURL) { article in
-                        NewsCard(
-                            title: article.title,
-                            summary: article.displaySummary,
-                            category: article.categoryValues.joined(separator: " · "),
-                            isNew: false
-                        )
+                        NavigationLink {
+                            NewsDetailView(article: article)
+                        } label: {
+                            NewsCard(
+                                title: article.title,
+                                summary: article.displaySummary,
+                                category: article.categoryValues.joined(separator: " · "),
+                                isNew: false
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding()
