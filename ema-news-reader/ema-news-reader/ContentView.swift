@@ -88,20 +88,20 @@ struct ContentView: View {
                         
                         NewsCard(
                             title: "Sample news title for layout testing",
-                            summary: "Sample summary used to check spacing and readability.",
-                            category: "Human",
+                            category: ["Human"],
+                            topics: ["Test", "Corporate"],
                             isNew: true
                         )
                         NewsCard(
                             title: "Sample news title for layout testing",
-                            summary: "Sample summary used to check spacing and readability.",
-                            category: "Human",
+                            category: ["Human"],
+                            topics: ["Test", "Corporate"],
                             isNew: true
                         )
                         NewsCard(
                             title: "Sample news title for layout testing",
-                            summary: "Sample summary used to check spacing and readability.",
-                            category: "Human",
+                            category: ["Human"],
+                            topics: ["Test", "Corporate"],
                             isNew: true
                         )
                     } else {

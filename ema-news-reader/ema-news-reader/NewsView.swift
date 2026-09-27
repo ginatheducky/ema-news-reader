@@ -20,8 +20,8 @@ struct NewsView: View {
                         } label: {
                             NewsCard(
                                 title: article.title,
-                                summary: article.displaySummary,
-                                category: article.categoryValues.joined(separator: " · "),
+                                category: article.categoryValues,
+                                topics: article.topicValues,
                                 isNew: false
                             )
                         }
