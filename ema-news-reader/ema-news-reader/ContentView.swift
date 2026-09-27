@@ -110,28 +110,28 @@ struct ContentView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .background(Color.blue.opacity(0.08))
-                .navigationTitle("Your Briefing")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Edit", systemImage: "slider.horizontal.3") {
-                            draftShowNews = showNews
-                            isEditingBriefing = true
-                        }
+            }
+            .background(Color.blue.opacity(0.08))
+            .navigationTitle("Your Briefing")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit", systemImage: "slider.horizontal.3") {
+                        draftShowNews = showNews
+                        isEditingBriefing = true
                     }
                 }
-                .sheet(isPresented: $isEditingBriefing) {
-                    BriefingEditor(
-                        draftShowNews: $draftShowNews,
-                        onCancel: {
-                            isEditingBriefing = false
-                        },
-                        onSave: {
-                            showNews = draftShowNews
-                            isEditingBriefing = false
-                        }
-                    )
-                }
+            }
+            .sheet(isPresented: $isEditingBriefing) {
+                BriefingEditor(
+                    draftShowNews: $draftShowNews,
+                    onCancel: {
+                        isEditingBriefing = false
+                    },
+                    onSave: {
+                        showNews = draftShowNews
+                        isEditingBriefing = false
+                    }
+                )
             }
         }
     }

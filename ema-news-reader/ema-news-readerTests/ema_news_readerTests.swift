@@ -167,5 +167,21 @@ struct ema_news_readerTests {
         #expect(!article.matchesSearch("conference"))
         #expect(!article.matchesSearch("Veterinary"))
     }
+    
+    @Test func matchesAnySelectedCategory() {
+        let article = NewsRecord(
+            title: "Test article",
+            newsSummary: "",
+            categories: "Human;Veterinary",
+            topics: "",
+            newsURL: "https://example.com/news/categories",
+            firstPublishedDate: "11/09/2026"
+        )
+        
+        #expect(article.matchesCategories([]))
+        #expect(article.matchesCategories(["Veterinary"]))
+        #expect(article.matchesCategories(["Corporate", "Human"]))
+        #expect(!article.matchesCategories(["Corporate"]))
+    }
 
 }

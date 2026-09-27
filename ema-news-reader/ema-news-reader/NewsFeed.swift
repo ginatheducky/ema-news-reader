@@ -27,6 +27,15 @@ nonisolated struct NewsFeed: Decodable {
                 entry.article
             }
     }
+    
+    var availableCategories: [String] {
+        // [["Human"], ["Human", "Veterinary"]] -> ["Human", "Human", "Veterinary"] -> ["Human", "Veterinary"]
+        let values = data.flatMap { article in
+            article.categoryValues
+        }
+        
+        return Set(values).sorted()
+    }
 }
 
 nonisolated struct NewsRecord: Decodable {
@@ -107,6 +116,16 @@ nonisolated struct NewsRecord: Decodable {
         
         return title.localizedStandardContains(trimmed)
         || newsSummary.localizedStandardContains(trimmed)
+    }
+    
+    func matchesCategories(_ selected: Set<String>) -> Bool {
+        if selected.isEmpty {
+            return true
+        }
+        
+        return categoryValues.contains { category in
+            selected.contains(category)
+        }
     }
 }
 

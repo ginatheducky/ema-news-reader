@@ -28,7 +28,7 @@ struct BriefingEditor: View {
                     }
                 }
                 
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         onSave()
                     }
