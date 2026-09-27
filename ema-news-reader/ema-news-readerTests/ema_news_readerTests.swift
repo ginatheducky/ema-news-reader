@@ -147,5 +147,25 @@ struct ema_news_readerTests {
             "Sample: August news"
         ])
     }
+    
+    @Test func searchesTitleAndSummary() {
+        let article = NewsRecord(
+            title: "Medicine review",
+            newsSummary: "An update about animal health.",
+            categories: "Veterinary",
+            topics: "Safety",
+            newsURL: "https://example.com/news/search-test",
+            firstPublishedDate: "11/09/2026"
+        )
+        
+        #expect(article.matchesSearch("MEDICINE"))
+        #expect(article.matchesSearch("animal health"))
+        #expect(article.matchesSearch("  review  "))
+        #expect(!article.matchesSearch("conference"))
+        #expect(article.matchesSearch(""))
+        #expect(article.matchesSearch("   "))
+        #expect(!article.matchesSearch("conference"))
+        #expect(!article.matchesSearch("Veterinary"))
+    }
 
 }

@@ -10,11 +10,19 @@ import SwiftUI
 struct NewsView: View {
     let articles: [NewsRecord]
     
+    @State private var searchText = ""
+    
+    private var filteredArticles: [NewsRecord] {
+        articles.filter { article in
+            article.matchesSearch(searchText)
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
-                    ForEach(articles, id: \.newsURL) { article in
+                    ForEach(filteredArticles, id: \.newsURL) { article in
                         NavigationLink {
                             NewsDetailView(article: article)
                         } label: {
@@ -31,7 +39,22 @@ struct NewsView: View {
                 .padding()
             }
             .background(Color.blue.opacity(0.08))
+            .overlay {
+                if articles.isEmpty {
+                    ContentUnavailableView(
+                        "No news available",
+                        systemImage: "newspaper",
+                        description: Text("There are no articles to display.")
+                    )
+                } else if filteredArticles.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                }
+            }
             .navigationTitle("News")
+            .searchable(
+                text: $searchText,
+                prompt: "Search titles and summaries"
+            )
         }
     }
 }
@@ -40,4 +63,8 @@ struct NewsView: View {
     NewsView(
         articles: NewsFeed(data: NewsRecord.samples).newestFirst
     )
+}
+
+#Preview("Empty news") {
+    NewsView(articles: [])
 }

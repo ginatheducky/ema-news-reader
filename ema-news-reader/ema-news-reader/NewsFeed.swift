@@ -98,6 +98,16 @@ nonisolated struct NewsRecord: Decodable {
         return date
     }
     
+    func matchesSearch(_ query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmed.isEmpty {
+            return true
+        }
+        
+        return title.localizedStandardContains(trimmed)
+        || newsSummary.localizedStandardContains(trimmed)
+    }
 }
 
 
