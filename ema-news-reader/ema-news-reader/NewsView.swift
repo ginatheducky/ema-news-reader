@@ -14,15 +14,25 @@ struct NewsView: View {
     
     @State private var searchText = ""
     @State private var selectedCategories: Set<String> = []
+    @State private var selectedTopics: Set<String> = []
     @State private var categoryMatchMode: CategoryMatchMode = .any
     
     private var availableCategories: [String] {
         NewsFeed(data: articles).availableCategories
     }
     
+    private var availableTopics: [String] {
+        NewsFeed(data: articles).availableTopics
+    }
+    
     private var filteredArticles: [NewsRecord] {
         articles.filter { article in
-            article.matchesSearch(searchText) && article.matchesCategories(selectedCategories, mode: categoryMatchMode)
+            article.matchesFilters(
+                query: searchText,
+                categories: selectedCategories,
+                categoryMode: categoryMatchMode,
+                topics: selectedTopics
+            )
         }
     }
     
@@ -36,6 +46,21 @@ struct NewsView: View {
                     selectedCategories.insert(category)
                 } else {
                     selectedCategories.remove(category)
+                }
+            }
+        )
+    }
+    
+    private func topicBinding(for topic: String) -> Binding<Bool> {
+        Binding(
+            get: {
+                selectedTopics.contains(topic)
+            },
+            set: { isSelected in
+                if isSelected {
+                    selectedTopics.insert(topic)
+                } else {
+                    selectedTopics.remove(topic)
                 }
             }
         )
@@ -73,7 +98,7 @@ struct NewsView: View {
                     ContentUnavailableView(
                         "No matching news",
                         systemImage: "magnifyingglass",
-                        description: Text("Try another search or clear your category selections.")
+                        description: Text("Try another search or clear your category and topic selections.")
                     )
                 }
             }
@@ -109,6 +134,32 @@ struct NewsView: View {
                         Label(
                             selectedCategories.isEmpty ? "Categories" : "Categories (\(selectedCategories.count))",
                             systemImage: "line.3.horizontal.decrease"
+                        )
+                    }
+                    .menuActionDismissBehavior(.disabled)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        ForEach(availableTopics, id: \.self) { topic in
+                            Toggle(
+                                topic,
+                                isOn: topicBinding(for: topic)
+                            )
+                        }
+                        
+                        Divider()
+                        
+                        Button("Clear topics") {
+                            selectedTopics.removeAll()
+                        }
+                        .disabled(selectedTopics.isEmpty)
+                    } label: {
+                        Label(
+                            selectedTopics.isEmpty
+                            ? "Topics"
+                            : "Topics (\(selectedTopics.count))",
+                            systemImage: "tag"
                         )
                     }
                     .menuActionDismissBehavior(.disabled)

@@ -41,6 +41,14 @@ nonisolated struct NewsFeed: Decodable {
         
         return Set(values).sorted()
     }
+    
+    var availableTopics: [String] {
+        let values = data.flatMap { article in
+            article.topicValues
+        }
+        
+        return Set(values).sorted()
+    }
 }
 
 nonisolated struct NewsRecord: Decodable {
@@ -137,6 +145,27 @@ nonisolated struct NewsRecord: Decodable {
         case .all:
             return selected.isSubset(of: Set(categoryValues))
         }
+    }
+    
+    func matchesTopics(_ selected: Set<String>) -> Bool {
+        if selected.isEmpty {
+            return true
+        }
+        
+        return topicValues.contains { topic in
+            selected.contains(topic)
+        }
+    }
+    
+    func matchesFilters(
+        query: String,
+        categories: Set<String>,
+        categoryMode: CategoryMatchMode,
+        topics: Set<String>
+    ) -> Bool {
+        matchesSearch(query)
+        && matchesCategories(categories, mode: categoryMode)
+        && matchesTopics(topics)
     }
 }
 
