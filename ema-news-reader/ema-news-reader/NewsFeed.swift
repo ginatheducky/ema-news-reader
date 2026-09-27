@@ -7,6 +7,11 @@
 
 import Foundation
 
+nonisolated enum CategoryMatchMode: String {
+    case any
+    case all
+}
+
 nonisolated struct NewsFeed: Decodable {
     let data: [NewsRecord]
     
@@ -118,13 +123,19 @@ nonisolated struct NewsRecord: Decodable {
         || newsSummary.localizedStandardContains(trimmed)
     }
     
-    func matchesCategories(_ selected: Set<String>) -> Bool {
+    func matchesCategories(_ selected: Set<String>, mode: CategoryMatchMode = .any) -> Bool {
         if selected.isEmpty {
             return true
         }
         
-        return categoryValues.contains { category in
-            selected.contains(category)
+        switch mode {
+        case .any:
+            return categoryValues.contains { category in
+                selected.contains(category)
+            }
+            
+        case .all:
+            return selected.isSubset(of: Set(categoryValues))
         }
     }
 }

@@ -14,6 +14,7 @@ struct NewsView: View {
     
     @State private var searchText = ""
     @State private var selectedCategories: Set<String> = []
+    @State private var categoryMatchMode: CategoryMatchMode = .any
     
     private var availableCategories: [String] {
         NewsFeed(data: articles).availableCategories
@@ -21,7 +22,7 @@ struct NewsView: View {
     
     private var filteredArticles: [NewsRecord] {
         articles.filter { article in
-            article.matchesSearch(searchText) && article.matchesCategories(selectedCategories)
+            article.matchesSearch(searchText) && article.matchesCategories(selectedCategories, mode: categoryMatchMode)
         }
     }
     
@@ -84,6 +85,13 @@ struct NewsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        Picker("Category matching", selection: $categoryMatchMode) {
+                            Text("Match any selected").tag(CategoryMatchMode.any)
+                            Text("Match all selected").tag(CategoryMatchMode.all)
+                        }
+                        
+                        Divider()
+                        
                         ForEach(availableCategories, id: \.self) { category in
                             Toggle(
                                 category,
@@ -103,6 +111,7 @@ struct NewsView: View {
                             systemImage: "line.3.horizontal.decrease"
                         )
                     }
+                    .menuActionDismissBehavior(.disabled)
                 }
             }
         }
