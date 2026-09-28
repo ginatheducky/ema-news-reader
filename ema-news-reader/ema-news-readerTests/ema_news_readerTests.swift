@@ -183,5 +183,43 @@ struct ema_news_readerTests {
         #expect(article.matchesCategories(["Corporate", "Human"]))
         #expect(!article.matchesCategories(["Corporate"]))
     }
+    
+    @Test func acceptsSuccessfulNewsResponse() throws {
+        let url = try #require(URL(string: "https://example.com/news"))
+        
+        let response = try #require(HTTPURLResponse(
+            url: url,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+        
+        let data = Data(#"{"data":[]}"#.utf8)
+        
+        let feed = try NewsService.decodeResponse(
+            data: data,
+            response: response
+        )
+        
+        #expect(feed.data.isEmpty)
+    }
+    
+    @Test func rejectsServerErrorBeforeDecoding() throws {
+        let url = try #require(URL(string: "https://example.com/news"))
+        
+        let response = try #require(HTTPURLResponse(
+            url: url,
+            statusCode: 503,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+        
+        #expect(throws: NewsServiceError.unsuccessfulStatus(503)) {
+            _ = try NewsService.decodeResponse(
+                data: Data(),
+                response: response
+            )
+        }
+    }
 
 }
