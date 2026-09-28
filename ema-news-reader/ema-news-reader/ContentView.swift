@@ -53,7 +53,7 @@ struct ContentView: View {
             
             Tab("Media", systemImage: "play.circle", value: AppTab.media) {
                 NavigationStack {
-                    Text("Media will appear here.")
+                    Text("YouTube videos will be added in a later update.")
                         .navigationTitle("Media")
                 }
             }
@@ -114,11 +114,21 @@ struct ContentView: View {
                         } else if newsStore.isLoading {
                             ProgressView("Loading EMA news…")
                         } else {
-                            Text("Open News to load your latest articles.")
-                                .foregroundStyle(.secondary)
+                            if let error = newsStore.errorMessage {
+                                Text(error)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Button(
+                                newsStore.errorMessage == nil ? "Load EMA news" : "Try again"
+                            ) {
+                                Task {
+                                    await newsStore.loadNews()
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
                         }
                     } else {
-                        Text("News is hidden, toggle button to show.")
+                        Text("News is hidden. Tap Edit to show it in your briefing.")
                     }
                 }
                 .padding()
