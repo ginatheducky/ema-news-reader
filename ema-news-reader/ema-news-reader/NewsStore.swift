@@ -25,6 +25,16 @@ final class NewsStore {
         self.loadArticles = loadArticles
     }
     
+    
+    func loadIfNeeded() async {
+        guard articles == nil else {
+            return
+        }
+        
+        await loadNews()
+    }
+    
+    
     func loadNews() async {
         guard !isLoading else {
             return
@@ -38,11 +48,15 @@ final class NewsStore {
         }
         
         do {
-            articles = try await loadArticles()
+            let downloadedArticles = try await loadArticles()
+            try Task.checkCancellation()
+            articles = downloadedArticles
         } catch is CancellationError {
-            // Cancellation is not a failed download to report.
+            // The task was cancelled; keep the current articles.
+        } catch let error as URLError where error.code == .cancelled {
+            // The network request was cancelled.
         } catch {
-            errorMessage = "News couldn’t be loaded. Please try again."
+            errorMessage = "News couldn't be loaded. Please try again."
             print("News load failed:", error)
         }
     }

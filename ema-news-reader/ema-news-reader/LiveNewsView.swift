@@ -14,6 +14,33 @@ struct LiveNewsView: View {
         Group {
             if let articles = store.articles {
                 NewsView(articles: articles)
+                    .safeAreaInset(edge: .bottom) {
+                        VStack(spacing: 8) {
+                            if let errorMessage = store.errorMessage {
+                                Text(errorMessage)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            
+                            if store.isLoading {
+                                ProgressView("Refreshing news…")
+                            } else {
+                                Button {
+                                    Task {
+                                        await store.loadNews()
+                                    }
+                                } label: {
+                                    Label("Refresh news", systemImage: "arrow.clockwise")
+                                        .frame(minHeight: 44)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(.regularMaterial)
+                    }
             } else {
                 NavigationStack {
                     VStack(spacing: 16) {

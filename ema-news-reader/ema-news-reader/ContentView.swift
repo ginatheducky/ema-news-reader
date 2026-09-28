@@ -58,6 +58,9 @@ struct ContentView: View {
                 }
             }
         }
+        .task {
+            await newsStore.loadIfNeeded()
+        }
     }
     
     private var briefingContent: some View {

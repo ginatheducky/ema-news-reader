@@ -188,9 +188,10 @@ struct NewsView: View {
                         }
                         .disabled(selectedCategories.isEmpty)
                     } label: {
-                        Label(
-                            selectedCategories.isEmpty ? "Categories" : "Categories (\(selectedCategories.count))",
-                            systemImage: "line.3.horizontal.decrease"
+                        FilterMenuLabel(
+                            title: "Categories",
+                            systemImage: "line.3.horizontal.decrease",
+                            selectionCount: selectedCategories.count
                         )
                     }
                     .menuActionDismissBehavior(.disabled)
@@ -219,11 +220,10 @@ struct NewsView: View {
                         }
                         .disabled(selectedTopics.isEmpty)
                     } label: {
-                        Label(
-                            selectedTopics.isEmpty
-                            ? "Topics"
-                            : "Topics (\(selectedTopics.count))",
-                            systemImage: "tag"
+                        FilterMenuLabel(
+                            title: "Topics",
+                            systemImage: "tag",
+                            selectionCount: selectedTopics.count
                         )
                     }
                     .menuActionDismissBehavior(.disabled)
