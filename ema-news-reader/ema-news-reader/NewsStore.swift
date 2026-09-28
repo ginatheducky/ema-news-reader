@@ -16,6 +16,7 @@ final class NewsStore {
     private(set) var errorMessage: String?
     private(set) var lastSuccessfulRefresh: Date?
     private(set) var readArticleURLs: Set<String>
+    private(set) var newArticleURLs: Set<String> = []
     
     private let loadArticles: () async throws -> [NewsRecord]
     private let now: () -> Date
@@ -43,6 +44,8 @@ final class NewsStore {
     
     
     func markAsRead(_ article: NewsRecord) {
+        newArticleURLs.remove(article.newsURL)
+        
         let result = readArticleURLs.insert(article.newsURL)
         
         guard result.inserted else {
@@ -53,6 +56,25 @@ final class NewsStore {
             readArticleURLs.sorted(),
             forKey: Self.readArticleURLsKey
         )
+    }
+    
+    
+    private func updateNewArticles(using downloadedArticles: [NewsRecord]) {
+        guard let previousArticles = articles else {
+            newArticleURLs = []
+            return
+        }
+        
+        let previousURLs = Set(previousArticles.map(\.newsURL))
+        let downloadedURLs = Set(downloadedArticles.map(\.newsURL))
+        let addedURLs = downloadedURLs.subtracting(previousURLs)
+        
+        if addedURLs.isEmpty {
+            newArticleURLs.formIntersection(downloadedURLs)
+            newArticleURLs.subtract(readArticleURLs)
+        } else {
+            newArticleURLs = addedURLs.subtracting(readArticleURLs)
+        }
     }
     
     
@@ -80,6 +102,8 @@ final class NewsStore {
         do {
             let downloadedArticles = try await loadArticles()
             try Task.checkCancellation()
+            
+            updateNewArticles(using: downloadedArticles)
             articles = downloadedArticles
             lastSuccessfulRefresh = now()
         } catch is CancellationError {

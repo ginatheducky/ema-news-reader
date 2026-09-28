@@ -115,7 +115,7 @@ struct ContentView: View {
                                             title: article.title,
                                             category: article.categoryValues,
                                             topics: article.topicValues,
-                                            isNew: false,
+                                            isNew: newsStore.newArticleURLs.contains(article.newsURL),
                                             isRead: newsStore.readArticleURLs.contains(article.newsURL)
                                         )
                                     }
@@ -180,4 +180,38 @@ struct ContentView: View {
             NewsFeed(data: NewsRecord.samples).newestFirst
         }
     ))
+}
+
+#Preview("Changing news feed") {
+    let firstArticle = NewsRecord.samples[0]
+    let secondArticle = NewsRecord.samples[1]
+    let thirdArticle = NewsRecord.samples[2]
+    
+    var loadCount = 0
+    
+    let store = NewsStore(
+        preferences: nil,
+        loadArticles: {
+            loadCount += 1
+            
+            let records: [NewsRecord]
+            
+            switch loadCount {
+            case 1:
+                records = [firstArticle]
+            case 2, 3:
+                records = [firstArticle, secondArticle]
+            default:
+                records = [
+                    firstArticle,
+                    secondArticle,
+                    thirdArticle
+                ]
+            }
+            
+            return NewsFeed(data: records).newestFirst
+        }
+    )
+    
+    LiveNewsView(store: store)
 }

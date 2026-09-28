@@ -503,4 +503,83 @@ struct ema_news_reader_appTests {
         #expect(secondStore.readArticleURLs.contains(article.newsURL))
     }
     
+    @MainActor
+    @Test
+    func newBadgesRemainUntilAnotherAdditionBatch() async {
+        let a = NewsRecord.samples[0]
+        let b = NewsRecord.samples[1]
+        let c = NewsRecord.samples[2]
+        
+        var response = [a]
+        
+        let store = NewsStore(
+            preferences: nil,
+            loadArticles: { response }
+        )
+        
+        await store.loadNews()
+        #expect(store.newArticleURLs.isEmpty)
+        
+        response = [a, b]
+        await store.loadNews()
+        #expect(store.newArticleURLs == Set([b.newsURL]))
+        
+        let editedA = NewsRecord(
+            title: a.title + " — corrected",
+            newsSummary: a.newsSummary,
+            categories: a.categories,
+            topics: a.topics,
+            newsURL: a.newsURL,
+            firstPublishedDate: a.firstPublishedDate
+        )
+        
+        // Editing an existing article preserves B's badge.
+        response = [editedA, b]
+        await store.loadNews()
+        #expect(store.newArticleURLs == Set([b.newsURL]))
+        
+        // Another addition batch replaces B with C.
+        response = [editedA, b, c]
+        await store.loadNews()
+        #expect(store.newArticleURLs == Set([c.newsURL]))
+        
+        // Removing an unrelated article preserves C's badge.
+        response = [editedA, c]
+        await store.loadNews()
+        #expect(store.newArticleURLs == Set([c.newsURL]))
+        
+        // Removing C removes its badge.
+        response = [editedA]
+        await store.loadNews()
+        #expect(store.newArticleURLs.isEmpty)
+    }
+    
+    @MainActor
+    @Test
+    func readingArticleRemovesNewBadge() async {
+        let a = NewsRecord.samples[0]
+        let b = NewsRecord.samples[1]
+        var response = [a]
+        
+        let store = NewsStore(
+            preferences: nil,
+            loadArticles: { response }
+        )
+        
+        await store.loadNews()
+        
+        response = [a, b]
+        await store.loadNews()
+        #expect(store.newArticleURLs.contains(b.newsURL))
+        
+        store.markAsRead(b)
+        
+        #expect(!store.newArticleURLs.contains(b.newsURL))
+        #expect(store.readArticleURLs.contains(b.newsURL))
+        
+        // An identical download must not restore the badge.
+        await store.loadNews()
+        #expect(!store.newArticleURLs.contains(b.newsURL))
+    }
+    
 }

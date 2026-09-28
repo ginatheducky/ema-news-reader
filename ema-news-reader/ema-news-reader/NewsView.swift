@@ -10,6 +10,7 @@ import SwiftUI
 struct NewsView: View {
     let articles: [NewsRecord]
     let readArticleURLs: Set<String>
+    let newArticleURLs: Set<String>
     let onReadArticle: (NewsRecord) -> Void
     
     private let preferences: UserDefaults?
@@ -20,9 +21,11 @@ struct NewsView: View {
     @State private var categoryMatchMode: CategoryMatchMode = .any
     @State private var topicMatchMode: TopicMatchMode = .any
     
+    
     init(
         articles: [NewsRecord],
         readArticleURLs: Set<String> = [],
+        newArticleURLs: Set<String> = [],
         onReadArticle: @escaping (NewsRecord) -> Void = { _ in },
         preferences: UserDefaults? = .standard
     ) {
@@ -30,6 +33,7 @@ struct NewsView: View {
         self.readArticleURLs = readArticleURLs
         self.onReadArticle = onReadArticle
         self.preferences = preferences
+        self.newArticleURLs = newArticleURLs
         
         let categories = preferences?
             .stringArray(forKey: "news.selectedCategories") ?? []
@@ -70,6 +74,12 @@ struct NewsView: View {
                 topics: selectedTopics,
                 topicMode: topicMatchMode
             )
+        }
+    }
+    
+    private var newFilteredArticles: [NewsRecord] {
+        filteredArticles.filter { article in
+            newArticleURLs.contains(article.newsURL)
         }
     }
     
@@ -133,6 +143,11 @@ struct NewsView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
+                    let newCount = newFilteredArticles.count
+                    if newCount > 0 {
+                        Text("\(newCount) new \(newCount == 1 ? "article" : "articles") in these results.")
+                    }
+                    
                     ForEach(filteredArticles, id: \.newsURL) { article in
                         NavigationLink {
                             NewsDetailView(article: article)
@@ -144,7 +159,7 @@ struct NewsView: View {
                                 title: article.title,
                                 category: article.categoryValues,
                                 topics: article.topicValues,
-                                isNew: false,
+                                isNew: newArticleURLs.contains(article.newsURL),
                                 isRead: readArticleURLs.contains(article.newsURL)
                             )
                         }
