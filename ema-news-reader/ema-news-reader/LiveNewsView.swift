@@ -13,7 +13,13 @@ struct LiveNewsView: View {
     var body: some View {
         Group {
             if let articles = store.articles {
-                NewsView(articles: articles)
+                NewsView(
+                    articles: articles,
+                    readArticleURLs: store.readArticleURLs,
+                    onReadArticle: { article in
+                        store.markAsRead(article)
+                    }
+                )
                     .safeAreaInset(edge: .bottom) {
                         VStack(spacing: 8) {
                             if let errorMessage = store.errorMessage {
@@ -84,18 +90,16 @@ struct LiveNewsView: View {
 
 #Preview("Offline loading example") {
     LiveNewsView(store: NewsStore(
-        now: {
-            Date(timeIntervalSince1970: 1_790_596_800)
-        },
-        loadArticles: {
-            NewsFeed(data: NewsRecord.samples).newestFirst
-        }
+        preferences: nil,
+        now: { Date(timeIntervalSince1970: 1_790_596_800) },
+        loadArticles: { NewsFeed(data: NewsRecord.samples).newestFirst }
     ))
 }
 
 
 #Preview("Failed loading") {
-    LiveNewsView(store: NewsStore(loadArticles: {
-        throw NewsServiceError.unsuccessfulStatus(503)
-    }))
+    LiveNewsView(store: NewsStore(
+        preferences: nil,
+        loadArticles: { throw NewsServiceError.unsuccessfulStatus(503) }
+    ))
 }

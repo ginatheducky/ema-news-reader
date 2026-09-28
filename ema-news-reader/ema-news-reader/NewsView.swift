@@ -9,6 +9,8 @@ import SwiftUI
 
 struct NewsView: View {
     let articles: [NewsRecord]
+    let readArticleURLs: Set<String>
+    let onReadArticle: (NewsRecord) -> Void
     
     private let preferences: UserDefaults?
     
@@ -20,9 +22,13 @@ struct NewsView: View {
     
     init(
         articles: [NewsRecord],
+        readArticleURLs: Set<String> = [],
+        onReadArticle: @escaping (NewsRecord) -> Void = { _ in },
         preferences: UserDefaults? = .standard
     ) {
         self.articles = articles
+        self.readArticleURLs = readArticleURLs
+        self.onReadArticle = onReadArticle
         self.preferences = preferences
         
         let categories = preferences?
@@ -130,12 +136,16 @@ struct NewsView: View {
                     ForEach(filteredArticles, id: \.newsURL) { article in
                         NavigationLink {
                             NewsDetailView(article: article)
+                                .onAppear {
+                                    onReadArticle(article)
+                                }
                         } label: {
                             NewsCard(
                                 title: article.title,
                                 category: article.categoryValues,
                                 topics: article.topicValues,
-                                isNew: false
+                                isNew: false,
+                                isRead: readArticleURLs.contains(article.newsURL)
                             )
                         }
                         .buttonStyle(.plain)

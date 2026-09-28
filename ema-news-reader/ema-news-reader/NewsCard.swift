@@ -12,6 +12,7 @@ struct NewsCard: View {
     let category: [String]
     let topics: [String]
     let isNew: Bool
+    var isRead: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -21,6 +22,12 @@ struct NewsCard: View {
                     .foregroundStyle(.blue)
                 
                 Spacer()
+                
+                if isRead {
+                    Label("Read", systemImage: "checkmark.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 
                 if isNew {
                     Text("NEW")
@@ -59,6 +66,21 @@ struct NewsCard: View {
         category: newsItem.categoryValues,
         topics: newsItem.topicValues,
         isNew: false
+    )
+    .padding()
+    .background(Color.blue.opacity(0.08))
+}
+
+
+#Preview("Read Article") {
+    let newsItem = NewsRecord.samples[1]
+    
+    NewsCard(
+        title: newsItem.title,
+        category: newsItem.categoryValues,
+        topics: newsItem.topicValues,
+        isNew: false,
+        isRead: true
     )
     .padding()
     .background(Color.blue.opacity(0.08))

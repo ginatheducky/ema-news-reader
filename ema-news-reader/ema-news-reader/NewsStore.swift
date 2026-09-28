@@ -15,18 +15,44 @@ final class NewsStore {
     private(set) var isLoading = false
     private(set) var errorMessage: String?
     private(set) var lastSuccessfulRefresh: Date?
+    private(set) var readArticleURLs: Set<String>
     
     private let loadArticles: () async throws -> [NewsRecord]
     private let now: () -> Date
+    private let preferences: UserDefaults?
+    private static let readArticleURLsKey = "news.readArticleURLs"
+    
     
     init(
+        preferences: UserDefaults? = .standard,
         now: @escaping () -> Date = { Date() },
         loadArticles: @escaping () async throws -> [NewsRecord] = {
             try await NewsService().fetchArticles()
         }
     ) {
+        self.preferences = preferences
         self.now = now
         self.loadArticles = loadArticles
+        
+        self.readArticleURLs = Set(
+            preferences?.stringArray(
+                forKey: Self.readArticleURLsKey
+            ) ?? []
+        )
+    }
+    
+    
+    func markAsRead(_ article: NewsRecord) {
+        let result = readArticleURLs.insert(article.newsURL)
+        
+        guard result.inserted else {
+            return
+        }
+        
+        preferences?.set(
+            readArticleURLs.sorted(),
+            forKey: Self.readArticleURLsKey
+        )
     }
     
     

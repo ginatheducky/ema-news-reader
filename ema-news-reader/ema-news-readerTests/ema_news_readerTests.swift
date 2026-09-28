@@ -469,4 +469,38 @@ struct ema_news_reader_appTests {
         #expect(!store.isLoading)
     }
     
+    @MainActor
+    @Test
+    func markingArticleReadDoesNotCreateDuplicates() {
+        let article = NewsRecord.samples[0]
+        let store = NewsStore(preferences: nil)
+        
+        store.markAsRead(article)
+        store.markAsRead(article)
+        
+        #expect(store.readArticleURLs == Set([article.newsURL]))
+    }
+    
+    @MainActor
+    @Test
+    func readStatusSurvivesCreatingAnotherStore() throws {
+        let suiteName = "ReadStatusTests.\(UUID().uuidString)"
+        let preferences = try #require(
+            UserDefaults(suiteName: suiteName)
+        )
+        
+        defer {
+            preferences.removePersistentDomain(forName: suiteName)
+        }
+        
+        let article = NewsRecord.samples[0]
+        let firstStore = NewsStore(preferences: preferences)
+        
+        firstStore.markAsRead(article)
+        
+        let secondStore = NewsStore(preferences: preferences)
+        
+        #expect(secondStore.readArticleURLs.contains(article.newsURL))
+    }
+    
 }

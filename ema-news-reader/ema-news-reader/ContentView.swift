@@ -107,12 +107,16 @@ struct ContentView: View {
                                 ForEach(articles.prefix(2), id: \.newsURL) { article in
                                     NavigationLink {
                                         NewsDetailView(article: article)
+                                            .onAppear {
+                                                newsStore.markAsRead(article)
+                                            }
                                     } label: {
                                         NewsCard(
                                             title: article.title,
                                             category: article.categoryValues,
                                             topics: article.topicValues,
-                                            isNew: false
+                                            isNew: false,
+                                            isRead: newsStore.readArticleURLs.contains(article.newsURL)
                                         )
                                     }
                                     .buttonStyle(.plain)
@@ -170,7 +174,10 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView(newsStore: NewsStore(loadArticles: {
-        NewsFeed(data: NewsRecord.samples).newestFirst
-    }))
+    ContentView(newsStore: NewsStore(
+        preferences: nil,
+        loadArticles: {
+            NewsFeed(data: NewsRecord.samples).newestFirst
+        }
+    ))
 }
