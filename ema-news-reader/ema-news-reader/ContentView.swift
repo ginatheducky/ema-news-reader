@@ -25,9 +25,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
-                NewsView(
-                    articles: NewsFeed(data: NewsRecord.samples).newestFirst
-                )
+                LiveNewsView()
             }
             
             Tab("Events", systemImage: "calendar", value: AppTab.events) {

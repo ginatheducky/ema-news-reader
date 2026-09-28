@@ -12,7 +12,28 @@ nonisolated enum NewsServiceError: Error, Equatable {
     case unsuccessfulStatus(Int)
 }
 
-nonisolated struct NewsService {
+nonisolated struct NewsService: Sendable {
+    @concurrent
+    func fetchArticles() async throws -> [NewsRecord] {
+        let feed = try await fetchFeed()
+        try Task.checkCancellation()
+        
+        let sorted = feed.newestFirst
+        
+        var seenURLs: Set<String> = []
+        
+        let uniqueArticles = sorted.filter { article in
+            let articleURL = article.newsURL
+            let insertionResult = seenURLs.insert(articleURL)
+            let isFirstOccurrence = insertionResult.inserted
+            
+            return isFirstOccurrence
+        }
+        
+        try Task.checkCancellation()
+        return uniqueArticles
+    }
+    
     func fetchFeed() async throws -> NewsFeed {
         guard let url = URL(
             string: "https://www.ema.europa.eu/en/documents/report/news-json-report_en.json"

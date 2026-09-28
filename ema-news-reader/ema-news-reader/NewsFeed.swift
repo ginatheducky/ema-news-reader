@@ -17,7 +17,7 @@ nonisolated enum TopicMatchMode: String {
     case all
 }
 
-nonisolated struct NewsFeed: Decodable {
+nonisolated struct NewsFeed: Decodable, Sendable {
     let data: [NewsRecord]
     
     // sort dates: an unparseable date uses Date.distantPast; for equal dates: Swift’s stable sort preserves their incoming order
@@ -56,7 +56,7 @@ nonisolated struct NewsFeed: Decodable {
     }
 }
 
-nonisolated struct NewsRecord: Decodable {
+nonisolated struct NewsRecord: Decodable, Sendable {
     let title: String
     let newsSummary: String
     let categories: String
