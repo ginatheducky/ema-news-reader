@@ -167,6 +167,13 @@ struct NewsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        Button("Clear categories") {
+                            selectedCategories.removeAll()
+                        }
+                        .disabled(selectedCategories.isEmpty)
+                        
+                        Divider()
+                        
                         Picker("Category matching", selection: $categoryMatchMode) {
                             Text("Match any selected").tag(CategoryMatchMode.any)
                             Text("Match all selected").tag(CategoryMatchMode.all)
@@ -180,13 +187,6 @@ struct NewsView: View {
                                 isOn: categoryBinding(for: category)
                             )
                         }
-                        
-                        Divider()
-                        
-                        Button("Clear categories") {
-                            selectedCategories.removeAll()
-                        }
-                        .disabled(selectedCategories.isEmpty)
                     } label: {
                         FilterMenuLabel(
                             title: "Categories",
@@ -199,6 +199,13 @@ struct NewsView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        Button("Clear topics") {
+                            selectedTopics.removeAll()
+                        }
+                        .disabled(selectedTopics.isEmpty)
+                        
+                        Divider()
+                        
                         Picker("Topic matching", selection: $topicMatchMode) {
                             Text("Match any selected").tag(TopicMatchMode.any)
                             Text("Match all selected").tag(TopicMatchMode.all)
@@ -212,13 +219,6 @@ struct NewsView: View {
                                 isOn: topicBinding(for: topic)
                             )
                         }
-                        
-                        Divider()
-                        
-                        Button("Clear topics") {
-                            selectedTopics.removeAll()
-                        }
-                        .disabled(selectedTopics.isEmpty)
                     } label: {
                         FilterMenuLabel(
                             title: "Topics",
