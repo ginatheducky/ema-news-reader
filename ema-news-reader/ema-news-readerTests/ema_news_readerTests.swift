@@ -582,4 +582,85 @@ struct ema_news_reader_appTests {
         #expect(!store.newArticleURLs.contains(b.newsURL))
     }
     
+    private func updateTestArticle(
+        title: String = "Example article",
+        updated: String? = nil
+    ) -> NewsRecord {
+        NewsRecord(
+            title: title,
+            newsSummary: "",
+            categories: "Human",
+            topics: "Medicines",
+            newsURL: "https://example.com/news/update-test",
+            firstPublishedDate: "01/09/2026",
+            lastUpdatedDate: updated
+        )
+    }
+    
+    @Test
+    func detectsContentChangesAndAdvancingUpdateDates() {
+        let original = updateTestArticle()
+        let dated = updateTestArticle(updated: "20/09/2026")
+        let later = updateTestArticle(updated: "21/09/2026")
+        let earlier = updateTestArticle(updated: "19/09/2026")
+        let edited = updateTestArticle(
+            title: "Corrected title",
+            updated: "20/09/2026"
+        )
+        
+        #expect(dated.hasUpdate(comparedTo: original))
+        #expect(later.hasUpdate(comparedTo: dated))
+        #expect(edited.hasUpdate(comparedTo: dated))
+        
+        #expect(!dated.hasUpdate(comparedTo: dated))
+        #expect(!earlier.hasUpdate(comparedTo: dated))
+        #expect(!original.hasUpdate(comparedTo: dated))
+    }
+    
+    @MainActor
+    @Test
+    func updatedBadgePersistsUntilCurrentVersionIsOpened() async {
+        let original = updateTestArticle()
+        let revised = updateTestArticle(updated: "20/09/2026")
+        let revisedAgain = updateTestArticle(updated: "21/09/2026")
+        
+        var response = [original]
+        
+        let store = NewsStore(
+            preferences: nil,
+            loadArticles: { response }
+        )
+        
+        await store.loadNews()
+        #expect(store.updatedArticleURLs.isEmpty)
+        
+        store.markAsRead(original)
+        
+        response = [revised]
+        await store.loadNews()
+        
+        #expect(store.readArticleURLs.contains(original.newsURL))
+        #expect(store.updatedArticleURLs.contains(original.newsURL))
+        
+        // An unchanged refresh preserves UPDATED.
+        await store.loadNews()
+        #expect(store.updatedArticleURLs.contains(original.newsURL))
+        
+        // Opening an older version cannot clear the latest update.
+        store.markAsRead(original)
+        #expect(store.updatedArticleURLs.contains(original.newsURL))
+        
+        store.markAsRead(revised)
+        #expect(store.updatedArticleURLs.isEmpty)
+        
+        // Reading it doesn't suppress a future update.
+        response = [revisedAgain]
+        await store.loadNews()
+        #expect(store.updatedArticleURLs.contains(original.newsURL))
+        
+        // Removing the article removes its badge.
+        response = []
+        await store.loadNews()
+        #expect(store.updatedArticleURLs.isEmpty)
+    }
 }

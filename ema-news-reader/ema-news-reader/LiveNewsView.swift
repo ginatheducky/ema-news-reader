@@ -17,6 +17,7 @@ struct LiveNewsView: View {
                     articles: articles,
                     readArticleURLs: store.readArticleURLs,
                     newArticleURLs: store.newArticleURLs,
+                    updatedArticleURLs: store.updatedArticleURLs,
                     onReadArticle: { article in
                         store.markAsRead(article)
                     }

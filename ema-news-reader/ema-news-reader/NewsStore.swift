@@ -17,6 +17,7 @@ final class NewsStore {
     private(set) var lastSuccessfulRefresh: Date?
     private(set) var readArticleURLs: Set<String>
     private(set) var newArticleURLs: Set<String> = []
+    private(set) var updatedArticleURLs: Set<String> = []
     
     private let loadArticles: () async throws -> [NewsRecord]
     private let now: () -> Date
@@ -45,6 +46,12 @@ final class NewsStore {
     
     func markAsRead(_ article: NewsRecord) {
         newArticleURLs.remove(article.newsURL)
+        
+        if let currentArticle = articles?.first(where: {
+            $0.newsURL == article.newsURL
+        }), currentArticle == article {
+            updatedArticleURLs.remove(article.newsURL)
+        }
         
         let result = readArticleURLs.insert(article.newsURL)
         
@@ -78,6 +85,36 @@ final class NewsStore {
     }
     
     
+    private func updateChangedArticles(
+        using downloadedArticles: [NewsRecord]
+    ) {
+        guard let previousArticles = articles else {
+            updatedArticleURLs = []
+            return
+        }
+        
+        let downloadedURLs = Set(downloadedArticles.map(\.newsURL))
+        
+        updatedArticleURLs.formIntersection(downloadedURLs)
+        
+        let previousByURL = Dictionary(
+            uniqueKeysWithValues: previousArticles.map {
+                ($0.newsURL, $0)
+            }
+        )
+        
+        for article in downloadedArticles {
+            guard let previous = previousByURL[article.newsURL] else {
+                continue
+            }
+            
+            if article.hasUpdate(comparedTo: previous) {
+                updatedArticleURLs.insert(article.newsURL)
+            }
+        }
+    }
+    
+    
     func loadIfNeeded() async {
         guard articles == nil else {
             return
@@ -104,6 +141,8 @@ final class NewsStore {
             try Task.checkCancellation()
             
             updateNewArticles(using: downloadedArticles)
+            updateChangedArticles(using: downloadedArticles)
+            
             articles = downloadedArticles
             lastSuccessfulRefresh = now()
         } catch is CancellationError {

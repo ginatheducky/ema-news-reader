@@ -116,7 +116,8 @@ struct ContentView: View {
                                             category: article.categoryValues,
                                             topics: article.topicValues,
                                             isNew: newsStore.newArticleURLs.contains(article.newsURL),
-                                            isRead: newsStore.readArticleURLs.contains(article.newsURL)
+                                            isRead: newsStore.readArticleURLs.contains(article.newsURL),
+                                            isUpdated: newsStore.updatedArticleURLs.contains(article.newsURL)
                                         )
                                     }
                                     .buttonStyle(.plain)

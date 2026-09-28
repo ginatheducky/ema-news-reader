@@ -29,6 +29,13 @@ struct NewsDetailView: View {
                         .foregroundStyle(.secondary)
                 }
                 
+                if article.updatedDate != nil,
+                   let rawDate = article.lastUpdatedDate {
+                    Text("Updated: \(rawDate)")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                
                 if let summary = article.displaySummary {
                     Text(summary)
                         .font(.body)

@@ -63,6 +63,7 @@ nonisolated struct NewsRecord: Decodable, Sendable, Hashable {
     let topics: String
     let newsURL: String
     let firstPublishedDate: String
+    let lastUpdatedDate: String?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -71,6 +72,7 @@ nonisolated struct NewsRecord: Decodable, Sendable, Hashable {
         case topics
         case newsURL = "news_url"
         case firstPublishedDate = "first_published_date"
+        case lastUpdatedDate = "last_updated_date"
     }
     
     var categoryValues: [String] {
@@ -110,6 +112,18 @@ nonisolated struct NewsRecord: Decodable, Sendable, Hashable {
     }
     
     var publicationDate: Date? {
+        Self.parseEMADate(firstPublishedDate)
+    }
+    
+    var updatedDate: Date? {
+        Self.parseEMADate(lastUpdatedDate)
+    }
+    
+    private static func parseEMADate(_ value: String?) -> Date? {
+        guard let value else {
+            return nil
+        }
+        
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.calendar = Calendar(identifier: .gregorian)
@@ -117,12 +131,39 @@ nonisolated struct NewsRecord: Decodable, Sendable, Hashable {
         formatter.dateFormat = "dd/MM/yyyy"
         formatter.isLenient = false
         
-        guard let date = formatter.date(from: firstPublishedDate),
-              formatter.string(from: date) == firstPublishedDate else {
+        guard let date = formatter.date(from: value),
+              formatter.string(from: date) == value else {
             return nil
         }
         
         return date
+    }
+    
+    func hasUpdate(comparedTo previous: NewsRecord) -> Bool {
+        guard newsURL == previous.newsURL else {
+            return false
+        }
+        
+        let contentChanged =
+        title != previous.title ||
+        newsSummary != previous.newsSummary ||
+        categories != previous.categories ||
+        topics != previous.topics ||
+        firstPublishedDate != previous.firstPublishedDate
+        
+        if contentChanged {
+            return true
+        }
+        
+        guard let currentDate = updatedDate else {
+            return false
+        }
+        
+        guard let previousDate = previous.updatedDate else {
+            return true
+        }
+        
+        return currentDate > previousDate
     }
     
     func matchesSearch(_ query: String) -> Bool {
@@ -190,7 +231,8 @@ extension NewsRecord {
             categories: "Human",
             topics: "Medicines",
             newsURL: "https://example.com/news/august",
-            firstPublishedDate: "31/08/2026"
+            firstPublishedDate: "31/08/2026",
+            lastUpdatedDate: "01/09/2026"
         ),
         NewsRecord(
             title: "Sample: September news",
@@ -198,7 +240,8 @@ extension NewsRecord {
             categories: "Human;Veterinary",
             topics: "Innovation;Test",
             newsURL: "https://example.com/news/september",
-            firstPublishedDate: "01/09/2026"
+            firstPublishedDate: "01/09/2026",
+            lastUpdatedDate: ""
         ),
         NewsRecord(
             title: "Sample: Another year, July",
@@ -206,7 +249,8 @@ extension NewsRecord {
             categories: "Veterinary",
             topics: "Innovation",
             newsURL: "https://example.com/news/July2025",
-            firstPublishedDate: "04/07/2025"
+            firstPublishedDate: "04/07/2025",
+            lastUpdatedDate: ""
         ),
         NewsRecord(
             title: "Sample: Date unavailable",
@@ -214,7 +258,8 @@ extension NewsRecord {
             categories: "Corporate",
             topics: "Innovation",
             newsURL: "https://example.com/news/unavailable",
-            firstPublishedDate: ""
+            firstPublishedDate: "",
+            lastUpdatedDate: ""
         ),
         NewsRecord(
             title: "Sample: August2 news",
@@ -222,7 +267,8 @@ extension NewsRecord {
             categories: "Human;Corporate",
             topics: "Medicines",
             newsURL: "https://example.com/news/august2",
-            firstPublishedDate: "15/08/2026"
+            firstPublishedDate: "15/08/2026",
+            lastUpdatedDate: ""
         )
     ]
 }

@@ -11,6 +11,7 @@ struct NewsView: View {
     let articles: [NewsRecord]
     let readArticleURLs: Set<String>
     let newArticleURLs: Set<String>
+    let updatedArticleURLs: Set<String>
     let onReadArticle: (NewsRecord) -> Void
     
     private let preferences: UserDefaults?
@@ -21,11 +22,13 @@ struct NewsView: View {
     @State private var categoryMatchMode: CategoryMatchMode = .any
     @State private var topicMatchMode: TopicMatchMode = .any
     
+
     
     init(
         articles: [NewsRecord],
         readArticleURLs: Set<String> = [],
         newArticleURLs: Set<String> = [],
+        updatedArticleURLs: Set<String> = [],
         onReadArticle: @escaping (NewsRecord) -> Void = { _ in },
         preferences: UserDefaults? = .standard
     ) {
@@ -34,6 +37,7 @@ struct NewsView: View {
         self.onReadArticle = onReadArticle
         self.preferences = preferences
         self.newArticleURLs = newArticleURLs
+        self.updatedArticleURLs = updatedArticleURLs
         
         let categories = preferences?
             .stringArray(forKey: "news.selectedCategories") ?? []
@@ -160,7 +164,8 @@ struct NewsView: View {
                                 category: article.categoryValues,
                                 topics: article.topicValues,
                                 isNew: newArticleURLs.contains(article.newsURL),
-                                isRead: readArticleURLs.contains(article.newsURL)
+                                isRead: readArticleURLs.contains(article.newsURL),
+                                isUpdated: updatedArticleURLs.contains(article.newsURL)
                             )
                         }
                         .buttonStyle(.plain)

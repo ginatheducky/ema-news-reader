@@ -13,6 +13,7 @@ struct NewsCard: View {
     let topics: [String]
     let isNew: Bool
     var isRead: Bool = false
+    var isUpdated: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -34,6 +35,18 @@ struct NewsCard: View {
                         .font(.caption.bold())
                         .foregroundStyle(.blue)
                 }
+            }
+            
+            if isUpdated {
+                Label("UPDATED", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.caption.bold())
+                    .foregroundStyle(.blue)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Color.blue.opacity(0.12),
+                        in: Capsule()
+                    )
             }
             
             Text(title)
@@ -81,6 +94,21 @@ struct NewsCard: View {
         topics: newsItem.topicValues,
         isNew: false,
         isRead: true
+    )
+    .padding()
+    .background(Color.blue.opacity(0.08))
+}
+
+#Preview("Previously read, now updated") {
+    let article = NewsRecord.samples[0]
+    
+    NewsCard(
+        title: article.title,
+        category: article.categoryValues,
+        topics: article.topicValues,
+        isNew: false,
+        isRead: true,
+        isUpdated: true
     )
     .padding()
     .background(Color.blue.opacity(0.08))
