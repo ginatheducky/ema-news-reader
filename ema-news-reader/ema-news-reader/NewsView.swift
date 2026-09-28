@@ -10,12 +10,42 @@ import SwiftUI
 struct NewsView: View {
     let articles: [NewsRecord]
     
-    //private let preferences: UserDefaults?
+    private let preferences: UserDefaults?
     
     @State private var searchText = ""
     @State private var selectedCategories: Set<String> = []
     @State private var selectedTopics: Set<String> = []
     @State private var categoryMatchMode: CategoryMatchMode = .any
+    @State private var topicMatchMode: TopicMatchMode = .any
+    
+    init(
+        articles: [NewsRecord],
+        preferences: UserDefaults? = .standard
+    ) {
+        self.articles = articles
+        self.preferences = preferences
+        
+        let categories = preferences?
+            .stringArray(forKey: "news.selectedCategories") ?? []
+        
+        let topics = preferences?
+            .stringArray(forKey: "news.selectedTopics") ?? []
+        
+        let newsModeValue = preferences?
+            .string(forKey: "news.categoryMatchMode") ?? "any"
+        
+        let topicModeValue = preferences?
+            .string(forKey: "news.topicMatchMode") ?? "any"
+        
+        _selectedCategories = State(initialValue: Set(categories))
+        _selectedTopics = State(initialValue: Set(topics))
+        _categoryMatchMode = State(
+            initialValue: CategoryMatchMode(rawValue: newsModeValue) ?? .any
+        )
+        _topicMatchMode = State(
+            initialValue: TopicMatchMode(rawValue: topicModeValue) ?? .any
+        )
+    }
     
     private var availableCategories: [String] {
         NewsFeed(data: articles).availableCategories
@@ -31,7 +61,8 @@ struct NewsView: View {
                 query: searchText,
                 categories: selectedCategories,
                 categoryMode: categoryMatchMode,
-                topics: selectedTopics
+                topics: selectedTopics,
+                topicMode: topicMatchMode
             )
         }
     }
@@ -63,6 +94,32 @@ struct NewsView: View {
                     selectedTopics.remove(topic)
                 }
             }
+        )
+    }
+    
+    private func saveFilters() {
+        guard let preferences else {
+            return
+        }
+        
+        preferences.set(
+            selectedCategories.sorted(),
+            forKey: "news.selectedCategories"
+        )
+        
+        preferences.set(
+            selectedTopics.sorted(),
+            forKey: "news.selectedTopics"
+        )
+        
+        preferences.set(
+            categoryMatchMode.rawValue,
+            forKey: "news.categoryMatchMode"
+        )
+        
+        preferences.set(
+            topicMatchMode.rawValue,
+            forKey: "news.topicMatchMode"
         )
     }
     
@@ -141,6 +198,13 @@ struct NewsView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        Picker("Topic matching", selection: $topicMatchMode) {
+                            Text("Match any selected").tag(TopicMatchMode.any)
+                            Text("Match all selected").tag(TopicMatchMode.all)
+                        }
+                        
+                        Divider()
+                        
                         ForEach(availableTopics, id: \.self) { topic in
                             Toggle(
                                 topic,
@@ -166,15 +230,28 @@ struct NewsView: View {
                 }
             }
         }
+        .onChange(of: selectedCategories) {
+            saveFilters()
+        }
+        .onChange(of: selectedTopics) {
+            saveFilters()
+        }
+        .onChange(of: categoryMatchMode) {
+            saveFilters()
+        }
+        .onChange(of: topicMatchMode) {
+            saveFilters()
+        }
     }
 }
 
 #Preview {
     NewsView(
-        articles: NewsFeed(data: NewsRecord.samples).newestFirst
+        articles: NewsFeed(data: NewsRecord.samples).newestFirst,
+        preferences: nil
     )
 }
 
 #Preview("Empty news") {
-    NewsView(articles: [])
+    NewsView(articles: [], preferences: nil)
 }

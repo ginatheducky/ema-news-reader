@@ -12,6 +12,11 @@ nonisolated enum CategoryMatchMode: String {
     case all
 }
 
+nonisolated enum TopicMatchMode: String {
+    case any
+    case all
+}
+
 nonisolated struct NewsFeed: Decodable {
     let data: [NewsRecord]
     
@@ -147,13 +152,19 @@ nonisolated struct NewsRecord: Decodable {
         }
     }
     
-    func matchesTopics(_ selected: Set<String>) -> Bool {
+    func matchesTopics(_ selected: Set<String>, mode: TopicMatchMode = .any) -> Bool {
         if selected.isEmpty {
             return true
         }
         
-        return topicValues.contains { topic in
-            selected.contains(topic)
+        switch mode {
+        case .any:
+            return topicValues.contains { topic in
+                selected.contains(topic)
+            }
+            
+        case .all:
+            return selected.isSubset(of: Set(topicValues))
         }
     }
     
@@ -161,11 +172,12 @@ nonisolated struct NewsRecord: Decodable {
         query: String,
         categories: Set<String>,
         categoryMode: CategoryMatchMode,
-        topics: Set<String>
+        topics: Set<String>,
+        topicMode: TopicMatchMode
     ) -> Bool {
         matchesSearch(query)
         && matchesCategories(categories, mode: categoryMode)
-        && matchesTopics(topics)
+        && matchesTopics(topics, mode: topicMode)
     }
 }
 
