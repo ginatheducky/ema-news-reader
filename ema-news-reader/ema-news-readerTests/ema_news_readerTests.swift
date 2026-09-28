@@ -415,4 +415,58 @@ struct ema_news_reader_appTests {
         #expect(!store.isLoading)
     }
     
+    @MainActor
+    @Test
+    func successfulRefreshUpdatesTimestamp() async {
+        let firstTime = Date(timeIntervalSince1970: 1_000)
+        let secondTime = Date(timeIntervalSince1970: 2_000)
+        var currentTime = firstTime
+        
+        let store = NewsStore(
+            now: { currentTime },
+            loadArticles: { [] }
+        )
+        
+        #expect(store.lastSuccessfulRefresh == nil)
+        
+        await store.loadNews()
+        #expect(store.lastSuccessfulRefresh == firstTime)
+        
+        currentTime = secondTime
+        
+        await store.loadNews()
+        #expect(store.lastSuccessfulRefresh == secondTime)
+    }
+    
+    @MainActor
+    @Test
+    func failedRefreshPreservesTimestamp() async {
+        let successfulTime = Date(timeIntervalSince1970: 1_000)
+        var currentTime = successfulTime
+        var shouldFail = false
+        
+        let store = NewsStore(
+            now: { currentTime },
+            loadArticles: {
+                if shouldFail {
+                    throw NewsServiceError.unsuccessfulStatus(503)
+                }
+                
+                return []
+            }
+        )
+        
+        await store.loadNews()
+        #expect(store.lastSuccessfulRefresh == successfulTime)
+        
+        currentTime = Date(timeIntervalSince1970: 2_000)
+        shouldFail = true
+        
+        await store.loadNews()
+        
+        #expect(store.lastSuccessfulRefresh == successfulTime)
+        #expect(store.errorMessage != nil)
+        #expect(!store.isLoading)
+    }
+    
 }

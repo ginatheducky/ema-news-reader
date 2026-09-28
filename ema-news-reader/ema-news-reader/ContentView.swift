@@ -70,8 +70,15 @@ struct ContentView: View {
                     Text("Your EMA overview")
                         .font(.headline)
                     
-                    Text("News, events and guidance will appear here.")
-                        .foregroundStyle(.secondary)
+                    if let lastRefresh = newsStore.lastSuccessfulRefresh {
+                        Text("Last checked: \(lastRefresh.formatted(date: .abbreviated, time: .shortened))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Your latest EMA news will appear here.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     
                     if showNews {
                         HStack {

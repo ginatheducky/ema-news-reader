@@ -14,14 +14,18 @@ final class NewsStore {
     private(set) var articles: [NewsRecord]?
     private(set) var isLoading = false
     private(set) var errorMessage: String?
+    private(set) var lastSuccessfulRefresh: Date?
     
     private let loadArticles: () async throws -> [NewsRecord]
+    private let now: () -> Date
     
     init(
+        now: @escaping () -> Date = { Date() },
         loadArticles: @escaping () async throws -> [NewsRecord] = {
             try await NewsService().fetchArticles()
         }
     ) {
+        self.now = now
         self.loadArticles = loadArticles
     }
     
@@ -51,6 +55,7 @@ final class NewsStore {
             let downloadedArticles = try await loadArticles()
             try Task.checkCancellation()
             articles = downloadedArticles
+            lastSuccessfulRefresh = now()
         } catch is CancellationError {
             // The task was cancelled; keep the current articles.
         } catch let error as URLError where error.code == .cancelled {

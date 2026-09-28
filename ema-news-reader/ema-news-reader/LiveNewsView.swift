@@ -35,6 +35,12 @@ struct LiveNewsView: View {
                                         .frame(minHeight: 44)
                                 }
                             }
+                            if let lastRefresh = store.lastSuccessfulRefresh {
+                                Text("Last checked: \(lastRefresh.formatted(date: .abbreviated, time: .shortened))")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal)
@@ -77,10 +83,16 @@ struct LiveNewsView: View {
 
 
 #Preview("Offline loading example") {
-    LiveNewsView(store: NewsStore(loadArticles: {
-        NewsFeed(data: NewsRecord.samples).newestFirst
-    }))
+    LiveNewsView(store: NewsStore(
+        now: {
+            Date(timeIntervalSince1970: 1_790_596_800)
+        },
+        loadArticles: {
+            NewsFeed(data: NewsRecord.samples).newestFirst
+        }
+    ))
 }
+
 
 #Preview("Failed loading") {
     LiveNewsView(store: NewsStore(loadArticles: {
