@@ -194,11 +194,35 @@ extension NewsRecord {
         ),
         NewsRecord(
             title: "Sample: September news",
-            newsSummary: "",
+            newsSummary: "Outcomes of the Committee for Veterinary Medicinal Products (CVMP) meeting",
             categories: "Human;Veterinary",
-            topics: "Innovation",
+            topics: "Innovation;Test",
             newsURL: "https://example.com/news/september",
             firstPublishedDate: "01/09/2026"
+        ),
+        NewsRecord(
+            title: "Sample: Another year, July",
+            newsSummary: "",
+            categories: "Veterinary",
+            topics: "Innovation",
+            newsURL: "https://example.com/news/July2025",
+            firstPublishedDate: "04/07/2025"
+        ),
+        NewsRecord(
+            title: "Sample: Date unavailable",
+            newsSummary: "",
+            categories: "Corporate",
+            topics: "Innovation",
+            newsURL: "https://example.com/news/unavailable",
+            firstPublishedDate: ""
+        ),
+        NewsRecord(
+            title: "Sample: August2 news",
+            newsSummary: "Example content for testing the news screen.",
+            categories: "Human;Corporate",
+            topics: "Medicines",
+            newsURL: "https://example.com/news/august2",
+            firstPublishedDate: "15/08/2026"
         )
     ]
 }
