@@ -21,11 +21,16 @@ struct ContentView: View {
     @State private var selectedTab: AppTab = .briefing
     @State private var isEditingBriefing = false
     @State private var draftShowNews = true
+    @State private var newsStore: NewsStore
+    
+    init(newsStore: NewsStore = NewsStore()) {
+        _newsStore = State(initialValue: newsStore)
+    }
     
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
-                LiveNewsView()
+                LiveNewsView(store: newsStore)
             }
             
             Tab("Events", systemImage: "calendar", value: AppTab.events) {
@@ -84,24 +89,31 @@ struct ContentView: View {
                             .accessibilityLabel("See all news")
                         }
                         
-                        NewsCard(
-                            title: "Sample news title for layout testing",
-                            category: ["Human"],
-                            topics: ["Test", "Corporate"],
-                            isNew: true
-                        )
-                        NewsCard(
-                            title: "Sample news title for layout testing",
-                            category: ["Human"],
-                            topics: ["Test", "Corporate"],
-                            isNew: true
-                        )
-                        NewsCard(
-                            title: "Sample news title for layout testing",
-                            category: ["Human"],
-                            topics: ["Test", "Corporate"],
-                            isNew: true
-                        )
+                        if let articles = newsStore.articles {
+                            if articles.isEmpty {
+                                Text("No news available.")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(articles.prefix(2), id: \.newsURL) { article in
+                                    NavigationLink {
+                                        NewsDetailView(article: article)
+                                    } label: {
+                                        NewsCard(
+                                            title: article.title,
+                                            category: article.categoryValues,
+                                            topics: article.topicValues,
+                                            isNew: false
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        } else if newsStore.isLoading {
+                            ProgressView("Loading EMA news…")
+                        } else {
+                            Text("Open News to load your latest articles.")
+                                .foregroundStyle(.secondary)
+                        }
                     } else {
                         Text("News is hidden, toggle button to show.")
                     }
@@ -138,5 +150,7 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView()
+    ContentView(newsStore: NewsStore(loadArticles: {
+        NewsFeed(data: NewsRecord.samples).newestFirst
+    }))
 }
