@@ -23,7 +23,9 @@ struct ContentView: View {
     @State private var draftShowNews = true
     @State private var newsStore: NewsStore
     
-    init(newsStore: NewsStore = NewsStore()) {
+    init(
+        newsStore: NewsStore = NewsStore(cache: NewsCache())
+    ) {
         _newsStore = State(initialValue: newsStore)
     }
     

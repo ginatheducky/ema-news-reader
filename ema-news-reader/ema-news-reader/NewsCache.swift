@@ -11,7 +11,11 @@ actor NewsCache {
     private let fileURL: URL
     
     
-    init(fileURL: URL) {
+    init(
+        fileURL: URL = URL.applicationSupportDirectory
+            .appendingPathComponent("EMAReader", isDirectory: true)
+            .appendingPathComponent("news-state-v1.json")
+    ) {
         self.fileURL = fileURL
     }
     

@@ -29,6 +29,19 @@ struct LiveNewsView: View {
                                     .font(.footnote)
                                     .foregroundStyle(.secondary)
                                     .multilineTextAlignment(.center)
+                                
+                                if !articles.isEmpty {
+                                    Text("Showing previously loaded news.")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            
+                            if let cacheErrorMessage = store.cacheErrorMessage {
+                                Text(cacheErrorMessage)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
                             }
                             
                             if store.isLoading {

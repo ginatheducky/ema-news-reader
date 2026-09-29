@@ -749,4 +749,98 @@ struct ema_news_reader_appTests {
             Issue.record("Unexpected error: \(error)")
         }
     }
+    
+    
+    @MainActor
+    @Test
+    func successfulDownloadSavesSnapshot() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+        
+        let cache = NewsCache(
+            fileURL: directory.appendingPathComponent("news.json")
+        )
+        let expected = NewsFeed(data: NewsRecord.samples).newestFirst
+        let time = Date(timeIntervalSince1970: 1_000)
+        
+        let store = NewsStore(
+            preferences: nil,
+            cache: cache,
+            now: { time },
+            loadArticles: { expected }
+        )
+        
+        await store.loadNews()
+        
+        let saved = try await cache.load()
+        
+        #expect(saved?.articles == expected)
+        #expect(saved?.lastSuccessfulRefresh == time)
+        #expect(saved?.newArticleURLs.isEmpty == true)
+        #expect(store.cacheErrorMessage == nil)
+    }
+    
+    @MainActor
+    @Test
+    func restoredBadgesCanBeClearedAndSavedOffline() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+        
+        let cache = NewsCache(
+            fileURL: directory.appendingPathComponent("news.json")
+        )
+        
+        let article = NewsRecord.samples[0]
+        let time = Date(timeIntervalSince1970: 1_000)
+        
+        try await cache.save(
+            NewsSnapshot(
+                articles: [article],
+                newArticleURLs: Set([article.newsURL]),
+                updatedArticleURLs: Set([article.newsURL]),
+                lastSuccessfulRefresh: time
+            )
+        )
+        
+        let store = NewsStore(
+            preferences: nil,
+            cache: cache,
+            loadArticles: {
+                throw URLError(.notConnectedToInternet)
+            }
+        )
+        
+        await store.loadNews()
+        
+        #expect(store.articles == [article])
+        #expect(store.lastSuccessfulRefresh == time)
+        #expect(store.newArticleURLs.contains(article.newsURL))
+        #expect(store.updatedArticleURLs.contains(article.newsURL))
+        #expect(store.errorMessage != nil)
+        
+        store.markAsRead(article)
+        await store.waitForPendingSave()
+        
+        let reopenedStore = NewsStore(
+            preferences: nil,
+            cache: cache,
+            loadArticles: {
+                throw URLError(.notConnectedToInternet)
+            }
+        )
+        
+        await reopenedStore.loadNews()
+        
+        #expect(reopenedStore.articles == [article])
+        #expect(reopenedStore.newArticleURLs.isEmpty)
+        #expect(reopenedStore.updatedArticleURLs.isEmpty)
+    }
 }

@@ -296,5 +296,10 @@ struct NewsView: View {
         lastSuccessfulRefresh: Date(timeIntervalSince1970: 1_000)
     )
     
-    NewsView(articles: snapshot.articles, preferences: nil)
+    NewsView(
+        articles: snapshot.articles,
+        newArticleURLs: snapshot.newArticleURLs,
+        updatedArticleURLs: snapshot.updatedArticleURLs,
+        preferences: nil
+    )
 }
