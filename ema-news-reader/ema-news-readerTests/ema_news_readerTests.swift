@@ -149,7 +149,8 @@ struct ema_news_reader_appTests {
             categories: "",
             topics:   "",
             newsURL: raw,
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.articleURL == nil)
@@ -164,7 +165,8 @@ struct ema_news_reader_appTests {
             categories: raw,
             topics: raw,
             newsURL: "https://example.com/news/test-article",
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.categoryValues.isEmpty)
@@ -179,7 +181,8 @@ struct ema_news_reader_appTests {
         "categories": 42,
         "topics": "Medicines",
         "news_url": "https://example.com/news/test-article",
-        "first_published_date": "11/09/2026"
+        "first_published_date": "11/09/2026",
+        "last_updated_date": ""
     }
     """
         
@@ -198,7 +201,8 @@ struct ema_news_reader_appTests {
             categories: "",
             topics:   "",
             newsURL: "https://example.com/news/test-article",
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.displaySummary == nil)
@@ -211,7 +215,8 @@ struct ema_news_reader_appTests {
             categories: "",
             topics:   "",
             newsURL: "https://example.com/news/test-article",
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.displaySummary == "Example Summary.")
@@ -225,7 +230,8 @@ struct ema_news_reader_appTests {
             categories: "",
             topics: "",
             newsURL: "https://example.com/news/test-article",
-            firstPublishedDate: raw
+            firstPublishedDate: raw,
+            lastUpdatedDate: ""
         )
         
         #expect(article.publicationDate == nil)
@@ -240,7 +246,8 @@ struct ema_news_reader_appTests {
             categories: "",
             topics: "",
             newsURL: "https://example.com/news/test-article",
-            firstPublishedDate: "31/08/2026"
+            firstPublishedDate: "31/08/2026",
+            lastUpdatedDate: ""
         )
         
         let articleSep = NewsRecord(
@@ -249,7 +256,8 @@ struct ema_news_reader_appTests {
             categories: "",
             topics: "",
             newsURL: "https://example.com/news/test-article",
-            firstPublishedDate: "01/09/2026"
+            firstPublishedDate: "01/09/2026",
+            lastUpdatedDate: ""
         )
         
         let dateAug = try #require(articleAug.publicationDate)
@@ -282,7 +290,8 @@ struct ema_news_reader_appTests {
             categories: "Veterinary",
             topics: "Safety",
             newsURL: "https://example.com/news/search-test",
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.matchesSearch("MEDICINE"))
@@ -301,7 +310,8 @@ struct ema_news_reader_appTests {
             categories: "Human;Veterinary",
             topics: "",
             newsURL: "https://example.com/news/matching-mode",
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.matchesCategories(
@@ -337,7 +347,8 @@ struct ema_news_reader_appTests {
             categories: "Human;Veterinary",
             topics: "Innovation;Medicines",
             newsURL: "https://example.com/news/combined-filters",
-            firstPublishedDate: "11/09/2026"
+            firstPublishedDate: "11/09/2026",
+            lastUpdatedDate: ""
         )
         
         #expect(article.matchesFilters(
@@ -530,7 +541,8 @@ struct ema_news_reader_appTests {
             categories: a.categories,
             topics: a.topics,
             newsURL: a.newsURL,
-            firstPublishedDate: a.firstPublishedDate
+            firstPublishedDate: a.firstPublishedDate,
+            lastUpdatedDate: a.lastUpdatedDate
         )
         
         // Editing an existing article preserves B's badge.
@@ -662,5 +674,79 @@ struct ema_news_reader_appTests {
         response = []
         await store.loadNews()
         #expect(store.updatedArticleURLs.isEmpty)
+    }
+    
+    @Test
+    func cacheRestoresSavedSnapshot() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+        
+        let fileURL = directory.appendingPathComponent("news.json")
+        let articles = NewsRecord.samples
+        
+        let snapshot = NewsSnapshot(
+            articles: articles,
+            newArticleURLs: Set([articles[0].newsURL]),
+            updatedArticleURLs: Set([articles[1].newsURL]),
+            lastSuccessfulRefresh: Date(timeIntervalSince1970: 1_000)
+        )
+        
+        let writer = NewsCache(fileURL: fileURL)
+        try await writer.save(snapshot)
+        
+        let reader = NewsCache(fileURL: fileURL)
+        let restored = try await reader.load()
+        
+        #expect(restored == snapshot)
+    }
+    
+    @Test
+    func cacheReturnsNilWhenNoFileExists() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        
+        let fileURL = directory.appendingPathComponent("news.json")
+        let cache = NewsCache(fileURL: fileURL)
+        
+        let restored = try await cache.load()
+        
+        #expect(restored == nil)
+    }
+    
+    @Test
+    func cacheReportsInvalidSavedData() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+        
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true
+        )
+        
+        let fileURL = directory.appendingPathComponent("news.json")
+        
+        try Data("This is not JSON".utf8).write(
+            to: fileURL,
+            options: .atomic
+        )
+        
+        let cache = NewsCache(fileURL: fileURL)
+        
+        do {
+            _ = try await cache.load()
+            Issue.record("Expected invalid JSON to throw an error.")
+        } catch is DecodingError {
+            // Expected: the file exists but cannot be decoded.
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+        }
     }
 }

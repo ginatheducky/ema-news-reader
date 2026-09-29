@@ -56,7 +56,7 @@ nonisolated struct NewsFeed: Decodable, Sendable {
     }
 }
 
-nonisolated struct NewsRecord: Decodable, Sendable, Hashable {
+nonisolated struct NewsRecord: Codable, Sendable, Hashable {
     let title: String
     let newsSummary: String
     let categories: String

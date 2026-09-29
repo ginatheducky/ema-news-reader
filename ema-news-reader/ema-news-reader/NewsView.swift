@@ -285,3 +285,16 @@ struct NewsView: View {
 #Preview("Empty news") {
     NewsView(articles: [], preferences: nil)
 }
+
+#Preview("Saved news snapshot") {
+    let articles = NewsRecord.samples
+    
+    let snapshot = NewsSnapshot(
+        articles: articles,
+        newArticleURLs: Set([articles[0].newsURL]),
+        updatedArticleURLs: Set([articles[1].newsURL]),
+        lastSuccessfulRefresh: Date(timeIntervalSince1970: 1_000)
+    )
+    
+    NewsView(articles: snapshot.articles, preferences: nil)
+}
