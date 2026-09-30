@@ -20,7 +20,6 @@ This is an independent project and is not affiliated with or endorsed by the Eur
 - [Search and filters](#search-and-filters)
 - [Architecture and local storage](#architecture-and-local-storage)
 - [Repository file guide](#repository-file-guide)
-- [Testing](#testing)
 - [Roadmap](#roadmap)
 - [License](#license)
 
