@@ -1,0 +1,54 @@
+# ----------------------------------------
+# macOS
+# ----------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ----------------------------------------
+# Xcode - User-specific settings
+# ----------------------------------------
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# ----------------------------------------
+# Xcode - Build files
+# ----------------------------------------
+build/
+DerivedData/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# ----------------------------------------
+# Xcode - Temporary files
+# ----------------------------------------
+*.hmap
+*.ipa
+*.swp
+*~
+
+# ----------------------------------------
+# Swift Package Manager
+# ----------------------------------------
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+
+# ----------------------------------------
+# Xcode Playgrounds
+# ----------------------------------------
+timeline.xctimeline
+playground.xcworkspace
+
+# ----------------------------------------
+# Testing
+# ----------------------------------------
+*.xcresult
+
+# ----------------------------------------
+# Environment and secrets
+# ----------------------------------------
+.env
+.env.*
+!.env.example
