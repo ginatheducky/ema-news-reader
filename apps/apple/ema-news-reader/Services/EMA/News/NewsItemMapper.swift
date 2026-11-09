@@ -9,10 +9,7 @@ import Foundation
 
 enum NewsItemMapper {
     static func map(_ record: NewsRecord) -> NewsItem? {
-        guard let url = URL(string: record.newsURL),
-              url.scheme?.lowercased() == "https",
-              let host = url.host,
-              !host.isEmpty else {
+        guard let url = EMARecordParsing.httpsURL(from: record.newsURL) else {
             return nil
         }
         

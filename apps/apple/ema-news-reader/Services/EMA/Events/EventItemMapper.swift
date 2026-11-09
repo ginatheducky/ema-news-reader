@@ -9,10 +9,7 @@ import Foundation
 
 enum EventItemMapper {
     static func map(_ record: EventRecord) -> EventItem? {
-        guard let url = URL(string: record.eventURL),
-              url.scheme?.lowercased() == "https",
-              let host = url.host,
-              !host.isEmpty else {
+        guard let url = EMARecordParsing.httpsURL(from: record.eventURL) else {
             return nil
         }
         
