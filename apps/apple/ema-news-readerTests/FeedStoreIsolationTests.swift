@@ -89,6 +89,10 @@ struct FeedStoreIsolationTests {
         
         #expect(news.feed?.items.first?.title == "Example news")
         #expect(guidelines.feed?.items.first?.title == "Investigation of bioequivalence")
+        #expect(events.feed == nil)
+        #expect((events.lastError as? URLError)?.code == .notConnectedToInternet)
+        #expect(news.lastError == nil)
+        #expect(guidelines.lastError == nil)
         
     }
 }
