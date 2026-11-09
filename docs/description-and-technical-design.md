@@ -458,23 +458,23 @@ Allow text to scale. Avoid fixed heights that clip content.
 
 ### Symbols
 
-| Purpose | SF Symbol |
-|---|---|
-| News tab | `newspaper` |
-| Events tab | `calendar` |
-| Briefing tab | `house` |
-| Guidelines tab | `book` |
-| Media tab | `play.circle` |
-| Search | `magnifyingglass` |
-| Filters/customization | `slider.horizontal.3` |
-| External source | `arrow.up.right.square` |
-| Share | `square.and.arrow.up` |
-| Time | `clock` |
-| Location | `mappin.and.ellipse` |
-| Online event | `video` |
-| Refresh | `arrow.clockwise` |
-| Reorder | `line.3.horizontal` |
-| Podcast | `headphones` |
+| Purpose               | SF Symbol               |
+| --------------------- | ----------------------- |
+| News tab              | `newspaper`             |
+| Events tab            | `calendar`              |
+| Briefing tab          | `house`                 |
+| Guidelines tab        | `book`                  |
+| Media tab             | `play.circle`           |
+| Search                | `magnifyingglass`       |
+| Filters/customization | `slider.horizontal.3`   |
+| External source       | `arrow.up.right.square` |
+| Share                 | `square.and.arrow.up`   |
+| Time                  | `clock`                 |
+| Location              | `mappin.and.ellipse`    |
+| Online event          | `video`                 |
+| Refresh               | `arrow.clockwise`       |
+| Reorder               | `line.3.horizontal`     |
+| Podcast               | `headphones`            |
 
 Check symbol availability against the deployment target. Use official brand assets or plain text for third-party services.
 
