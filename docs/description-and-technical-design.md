@@ -37,6 +37,7 @@ Switching tabs preserves loaded content and does not itself trigger another down
 
 Original-source links open in the user’s browser. Returning to the app preserves the previous screen, filters, and position where practical.
 
+
 ## 3. Features by tab
 
 ### 3.1 News
@@ -520,6 +521,9 @@ Before adding embeds, assess the actual requests, storage, disclosures, and any 
 ## 8. Technical design
 
 This section describes the proposed implementation. Component names and boundaries can change as the app develops.
+
+### Architecture Note
+The initial implementation targets iPhone with SwiftUI. A future Android app may reuse a Swift package containing platform-independent models and behavior. Keep decoding, filtering, change detection, and schedule interpretation independent of SwiftUI. Extract shared packages when working features justify them. Android support is a future learning milestone.
 
 ### 8.1 Data sources
 
