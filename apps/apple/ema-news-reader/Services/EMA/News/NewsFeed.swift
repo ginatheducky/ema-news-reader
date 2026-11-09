@@ -14,16 +14,6 @@ struct NewsFeed: Decodable {
     let meta: MetaData
 }
 
-struct MetaData: Codable {
-    let totalRecords: Int
-    let timestamp: String
-    
-    enum CodingKeys: String, CodingKey {
-        case totalRecords = "total_records"
-        case timestamp
-    }
-}
-
 struct NewsRecord: Codable {
     let title: String
     let pressRelease: String

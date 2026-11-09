@@ -24,7 +24,7 @@ struct NewsFeedLoaderTests {
               "title": "Example news",
               "press_release": "Yes",
               "related_medicine_referral": "",
-              "categories": "Veterinary; Human",
+              "categories": "Veterinary; Human; ",
               "topics": "",
               "news_summary": "Example summary",
               "first_published_date": "06/11/2026",
