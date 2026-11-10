@@ -24,7 +24,23 @@ final class NewsStore {
         self.now = now
     }
     
+    func shouldRefresh() -> Bool {
+        guard feed != nil, let checkedAt = lastSuccessfulCheck else {
+            return true
+        }
+        
+        let elapsedSeconds = now().timeIntervalSince(checkedAt)
+        return elapsedSeconds > 60 * 60
+    }
+    
+    func refreshIfNeeded(from url: URL) async {
+        guard shouldRefresh() else { return }
+        await refresh(from: url)
+    }
+    
     func refresh(from url: URL) async {
+        guard !isLoading else { return } // prevent two requests from running at once
+        
         isLoading = true
         lastError = nil
         
