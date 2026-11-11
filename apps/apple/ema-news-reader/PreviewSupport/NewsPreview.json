@@ -1,0 +1,85 @@
+{
+    "meta": {
+        "total_records": 7,
+        "timestamp": "2026-11-08T18:02:08Z"
+    },
+    "data": [
+        {
+            "title": "Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP) 3-5 November 2026",
+            "press_release": "No",
+            "related_medicine_referral": "Credelio Quattro;Credelio;Nobivac PLUS DHPPi / Leptos;Laverdia;Scovella",
+            "categories": "Veterinary",
+            "topics": "Medicines",
+            "news_summary": "Outcomes of the Committee for Veterinary Medicinal Products (CVMP) meeting",
+            "first_published_date": "06/11/2026",
+            "last_updated_date": "",
+            "news_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-veterinary-medicinal-products-cvmp-3-5-november-2026"
+        },
+        {
+            "title": "Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC) 26 - 29 October 2026",
+            "press_release": "No",
+            "related_medicine_referral": "Flupentixol/melitracen-containing medicinal products",
+            "categories": "Human",
+            "topics": "Pharmacovigilance",
+            "news_summary": "PRAC starts review of depression and anxiety medicine Deanxit and a safety signal related to human normal immunoglobulin medicines",
+            "first_published_date": "30/10/2026",
+            "last_updated_date": "",
+            "news_url": "https://www.ema.europa.eu/en/news/meeting-highlights-pharmacovigilance-risk-assessment-committee-prac-26-29-october-2026"
+        },
+        {
+            "title": "EMA closed on All Souls' Day, 2 November",
+            "press_release": "No",
+            "related_medicine_referral": "",
+            "categories": "Corporate",
+            "topics": "",
+            "news_summary": "The European Medicines Agency's (EMA) office is closed from 18:00 on Friday 30 October until 08:30 on Tuesday 3 November",
+            "first_published_date": "29/10/2026",
+            "last_updated_date": "",
+            "news_url": "https://www.ema.europa.eu/en/news/ema-closed-all-souls-day-2-november"
+        },
+        {
+            "title": "AMA and EMA issue joint guidance on Ebola vaccine development",
+            "press_release": "No",
+            "related_medicine_referral": "",
+            "categories": "Human",
+            "topics": "Clinical trials;Research and development;Vaccines",
+            "news_summary": "Clinical trial requirements defined for rapid development of Bundibugyo virus vaccines",
+            "first_published_date": "23/10/2026",
+            "last_updated_date": "",
+            "news_url": "https://www.ema.europa.eu/en/news/ama-ema-issue-joint-guidance-ebola-vaccine-development"
+        },
+        {
+            "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 12-15 October 2026",
+            "press_release": "No",
+            "related_medicine_referral": "Foundayo;Rasonque;Yuviwel;Fovlussea;Neuzafy;Kizfizo;Kyinsu;Talvey;Tukysa;Tryngolza;Yartemlea;Mylotarg;Truqap;Ibrance",
+            "categories": "Human",
+            "topics": "Medicines",
+            "news_summary": "Six new medicines recommended for approval; another five medicines recommended for extension of their therapeutic indications",
+            "first_published_date": "16/10/2026",
+            "last_updated_date": "",
+            "news_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026"
+        },
+        {
+            "title": "New oral GLP-1 medicine for weight management and type 2 diabetes",
+            "press_release": "No",
+            "related_medicine_referral": "Foundayo",
+            "categories": "Human",
+            "topics": "Medicines",
+            "news_summary": "Once-daily tablet provides an alternative to other oral and injectable GLP-1 medicines",
+            "first_published_date": "16/10/2026",
+            "last_updated_date": "",
+            "news_url": "https://www.ema.europa.eu/en/news/new-oral-glp-1-medicine-weight-management-type-2-diabetes"
+        },
+        {
+            "title": "Second Meeting of the Management Board of the European Agency for the Evaluation of Medicinal Products",
+            "press_release": "Yes",
+            "related_medicine_referral": "",
+            "categories": "Corporate",
+            "topics": "",
+            "news_summary": "",
+            "first_published_date": "13/04/1994",
+            "last_updated_date": "13/04/1994",
+            "news_url": "https://www.ema.europa.eu/en/news/second-meeting-management-board-european-agency-evaluation-medicinal-products"
+        }
+    ]
+}
