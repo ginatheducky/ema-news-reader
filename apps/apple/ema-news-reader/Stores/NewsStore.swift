@@ -47,8 +47,15 @@ final class NewsStore {
         defer { isLoading = false }
         
         do {
-            feed = try await loader.load(from: url)
+            let loadedFeed = try await loader.load(from: url)
+            try Task.checkCancellation()
+            
+            feed = loadedFeed
             lastSuccessfulCheck = now()
+        } catch is CancellationError {
+            return
+        } catch let error as URLError where error.code == .cancelled {
+            return
         } catch {
             lastError = error
         }

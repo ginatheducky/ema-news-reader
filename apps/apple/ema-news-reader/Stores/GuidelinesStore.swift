@@ -24,15 +24,38 @@ final class GuidelinesStore {
         self.now = now
     }
     
+    func shouldRefresh() -> Bool {
+        guard feed != nil, let checkedAt = lastSuccessfulCheck else {
+            return true
+        }
+        
+        let elapsedSeconds = now().timeIntervalSince(checkedAt)
+        return elapsedSeconds > 60 * 60
+    }
+    
+    func refreshIfNeeded(from url: URL) async {
+        guard shouldRefresh() else { return }
+        await refresh(from: url)
+    }
+    
     func refresh(from url: URL) async {
+        guard !isLoading else { return } // prevent two requests from running at once
+        
         isLoading = true
         lastError = nil
         
         defer { isLoading = false }
         
         do {
-            feed = try await loader.load(from: url)
+            let loadedFeed = try await loader.load(from: url)
+            try Task.checkCancellation()
+            
+            feed = loadedFeed
             lastSuccessfulCheck = now()
+        } catch is CancellationError {
+            return
+        } catch let error as URLError where error.code == .cancelled {
+            return
         } catch {
             lastError = error
         }
