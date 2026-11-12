@@ -9,6 +9,16 @@ import Foundation
 
 extension NewsItem {
     static func loadPreviewSamples() throws -> [NewsItem] {
+        let data = try loadPreviewData()
+        
+        let feed = try JSONDecoder().decode(NewsFeed.self, from: data)
+        
+        return feed.data.compactMap { record in
+            NewsItemMapper.map(record)
+        }
+    }
+    
+    static func loadPreviewData() throws -> Data {
         guard let fixtureURL = Bundle.main.url(
             forResource: "NewsPreview",
             withExtension: "json"
@@ -16,11 +26,6 @@ extension NewsItem {
             throw CocoaError(.fileNoSuchFile)
         }
         
-        let data = try Data(contentsOf: fixtureURL)
-        let feed = try JSONDecoder().decode(NewsFeed.self, from: data)
-        
-        return feed.data.compactMap { record in
-            NewsItemMapper.map(record)
-        }
+        return try Data(contentsOf: fixtureURL)
     }
 }
