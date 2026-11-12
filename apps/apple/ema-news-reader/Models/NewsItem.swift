@@ -31,5 +31,33 @@ struct NewsItem {
         
         return titleMatches || summaryMatches
     }
+    
+    func matchesAnyCategory(_ selectedCategories: Set<String>) -> Bool {
+        if selectedCategories.isEmpty {
+            return true
+        }
+        
+        return categories.contains { category in
+            selectedCategories.contains(category)
+        }
+    }
+    
+    func matchesAllCategories(_ selectedCategories: Set<String>) -> Bool {        
+        return selectedCategories.isSubset(of: Set(categories))
+    }
+    
+    func matchesAnyTopic(_ selectedTopics: Set<String>) -> Bool {
+        if selectedTopics.isEmpty {
+            return true
+        }
+        
+        return topics.contains { topic in
+            selectedTopics.contains(topic)
+        }
+    }
+    
+    func matchesAllTopics(_ selectedTopics: Set<String>) -> Bool {
+        return selectedTopics.isSubset(of: Set(topics))
+    }
 }
 
