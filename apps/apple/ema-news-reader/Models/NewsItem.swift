@@ -17,5 +17,19 @@ struct NewsItem {
     let firstPublishedDate: Date
     let lastUpdatedDate: Date?
     let newsURL: URL
+    
+    func matchesSearch(_ query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmed.isEmpty {
+            return true
+        }
+        
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        let titleMatches = title.range(of: trimmed, options: options) != nil
+        let summaryMatches = newsSummary?.range(of: trimmed, options: options) != nil
+        
+        return titleMatches || summaryMatches
+    }
 }
 
