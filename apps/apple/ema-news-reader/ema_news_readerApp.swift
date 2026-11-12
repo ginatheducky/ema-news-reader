@@ -49,7 +49,7 @@ struct ema_news_readerApp: App {
     
     private func refreshFeedsIfNeeded() async {
         guard
-            let newsURL = URL(string: "https://www.ema.europa.eu/en/documents/report/news-json-report_en.json"),
+            let newsURL = EMAFeedURLs.news,
             let eventsURL = URL(string: "https://www.ema.europa.eu/en/documents/report/events-json-report_en.json"),
             let guidelinesURL = URL(string: "https://www.ema.europa.eu/en/documents/report/scientific-guidelines-output-json-report_en.json")
                 else { return }

@@ -16,14 +16,21 @@ enum AppTab: Hashable {
 }
 
 struct ContentView: View {
+    @Environment(NewsStore.self) private var newsStore
+    
     @State private var selectedTab: AppTab = .briefing
     
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
-                Text("Here the news will appear.")
+                if let feedURL = EMAFeedURLs.news {
+                    NewsScreen(feedURL: feedURL, store: newsStore)
+                        .background(Color.blue.opacity(0.08))
+                } else {
+                    Text("The News feed URL is unavailable.")
+                }
             }
-            
+
             Tab("Events", systemImage: "calendar", value: AppTab.events) {
                 Text("Here the events will appear.")
             }
@@ -44,5 +51,27 @@ struct ContentView: View {
 }
 
 #Preview {
+    let fixture = Result(catching: { try NewsItem.loadPreviewData() })
+    let client = EMAClient(request: { url in
+        guard let response = HTTPURLResponse(
+            url: url,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        return (try fixture.get(), response)
+    })
+    
+    let store = NewsStore(loader: NewsFeedLoader(client: client))
+
     ContentView()
+        .environment(store)
+        .task {
+            if let url = EMAFeedURLs.news {
+                await store.refreshIfNeeded(from: url)
+            }
+        }
 }
