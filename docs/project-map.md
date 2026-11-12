@@ -12,15 +12,30 @@ The following paths start at `apps/apple/ema-news-reader/`.
 
 | File or folder | What it does |
 | --- | --- |
-| `ema_news_readerApp.swift` | SwiftUI entry point. Creates a window with `ContentView`. |
-| `ContentView.swift` | Root view with placeholder text and its Xcode preview. |
+| `ema_news_readerApp.swift` | Owns and injects the three feed stores and refreshes them when the scene becomes active. |
+| `ContentView.swift` | Five-tab shell with Briefing selected initially. Connects News to its store and supplies placeholders for the other tabs. |
 | `Assets.xcassets/` | Asset catalog with entries for the app icon and accent color. |
-| `Models/NewsItem.swift` | App model for a news article, including its summary, topics, categories, and source link. |
+| `Models/NewsItem.swift` | App model for a news article, including its optional summary, topics, categories, and source link. |
 | `Models/EventItem.swift` | App model for an event, including its schedule text, online and broadcast flags, and optional location. |
 | `Models/GuidelineItem.swift` | App model for a guideline, including its categories, publication dates, and source link. |
+| `Services/EMA/EMAFeedURLs.swift` | Defines the News feed endpoint used by the app and previews. |
 | `Services/EMA/EMAClient.swift` | Fetches response bytes and validates the HTTP status. |
 | `Services/EMA/EMARecordParsing.swift` | Validates record links as absolute HTTPS URLs with a host. |
 | `Services/EMA/MetaData.swift` | Models the total record count and timestamp in the feed's `meta` object. |
+
+## Stores, views, and previews
+
+| File | What it does |
+| --- | --- |
+| `Stores/NewsStore.swift` | Tracks the loaded News feed, freshness, loading, and errors. Handles automatic and manual refresh. |
+| `Stores/EventsStore.swift` | Owns refresh and loaded state for Events. |
+| `Stores/GuidelinesStore.swift` | Owns refresh and loaded state for Scientific Guidelines. |
+| `Views/News/NewsScreen.swift` | Connects the store to loading, error, retry, and pull-to-refresh UI. |
+| `Views/News/NewsListView.swift` | Displays the empty state or scrollable cards and owns list-to-detail navigation. |
+| `Views/News/NewsCard.swift` | Presents an article at a glance in the News list. |
+| `Views/News/NewsDetailView.swift` | Displays article metadata and links to the original EMA page. |
+| `PreviewSupport/NewsItemPreview.swift` | Loads bundled fixture bytes and maps preview records into News items. |
+| `PreviewSupport/NewsPreview.json` | Bundled EMA-format fixture for offline News previews. |
 
 ## Feed files
 
