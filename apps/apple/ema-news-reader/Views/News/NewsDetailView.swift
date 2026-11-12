@@ -88,6 +88,9 @@ struct NewsDetailView: View {
             }
             .padding()
         }
+        .background {
+            Color("AppBackground").ignoresSafeArea()
+        }
     }
 }
 

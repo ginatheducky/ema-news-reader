@@ -12,27 +12,32 @@ struct NewsListView: View {
     
     var body: some View {
         NavigationStack {
-            if items.isEmpty {
-                // empty state view
-                ContentUnavailableView(
-                    "No news articles",
-                    systemImage: "newspaper",
-                    description: Text("The EMA news feed is currently empty.")
-                )
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 16) {
-                        ForEach(items, id: \.newsURL) { item in
-                            NavigationLink {
-                                NewsDetailView(item: item)
-                            } label: {
-                                NewsCard(item: item)
+            Group {
+                if items.isEmpty {
+                    // empty state view
+                    ContentUnavailableView(
+                        "No news articles",
+                        systemImage: "newspaper",
+                        description: Text("The EMA news feed is currently empty.")
+                    )
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(items, id: \.newsURL) { item in
+                                NavigationLink {
+                                    NewsDetailView(item: item)
+                                } label: {
+                                    NewsCard(item: item)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
+                        .padding()
                     }
-                    .padding()
                 }
+            }
+            .background {
+                Color("AppBackground").ignoresSafeArea()
             }
         }
     }
@@ -42,7 +47,6 @@ struct NewsListView: View {
     switch Result(catching: { try NewsItem.loadPreviewSamples() }) {
     case .success(let items):
         NewsListView(items: items)
-            .background(Color.blue.opacity(0.08))
     case .failure(let error):
         Text("Couldn’t load NewsPreview.json: \(error.localizedDescription)")
     }
@@ -50,5 +54,4 @@ struct NewsListView: View {
 
 #Preview("Empty news list") {
     NewsListView(items: [])
-        .background(Color.blue.opacity(0.08))
 }
