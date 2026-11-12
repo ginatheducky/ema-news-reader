@@ -547,17 +547,17 @@ Keep source decoding separate from interpretation where this improves clarity. A
 
 #### News
 
-| JSON field | App representation |
-|---|---|
-| `title` | String |
-| `press_release` | Bool |
-| `related_medicine_referral` | Array of names |
-| `categories` | Array of strings |
-| `topics` | Array of strings |
-| `news_summary` | String |
-| `first_published_date` | Parsed publication date |
-| `last_updated_date` | Optional parsed date |
-| `news_url` | Validated URL and proposed identifier |
+| JSON field                  | App representation                    |
+| --------------------------- | ------------------------------------- |
+| `title`                     | String                                |
+| `press_release`             | Bool                                  |
+| `related_medicine_referral` | Array of names or empty               |
+| `categories`                | Array of strings or empty             |
+| `topics`                    | Array of strings or empty             |
+| `news_summary`              | optional String                       |
+| `first_published_date`      | Parsed publication date               |
+| `last_updated_date`         | Optional parsed date                  |
+| `news_url`                  | Validated URL and proposed identifier |
 
 Split semicolon-separated fields, trim whitespace, and discard empty values.
 

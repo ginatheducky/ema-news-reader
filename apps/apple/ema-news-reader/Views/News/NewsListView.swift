@@ -11,21 +11,28 @@ struct NewsListView: View {
     let items: [NewsItem]
     
     var body: some View {
-        if items.isEmpty {
-            // empty state view
-            ContentUnavailableView(
-                "No news articles",
-                systemImage: "newspaper",
-                description: Text("The EMA news feed is currently empty.")
-            )
-        } else {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(items, id: \.newsURL) { item in
-                        NewsCard(item: item)
+        NavigationStack {
+            if items.isEmpty {
+                // empty state view
+                ContentUnavailableView(
+                    "No news articles",
+                    systemImage: "newspaper",
+                    description: Text("The EMA news feed is currently empty.")
+                )
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(items, id: \.newsURL) { item in
+                            NavigationLink {
+                                NewsDetailView(item: item)
+                            } label: {
+                                NewsCard(item: item)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
+                    .padding()
                 }
-                .padding()
             }
         }
     }

@@ -53,7 +53,7 @@ enum NewsItemMapper {
             relatedMedicineReferral: splitList(record.relatedMedicineReferral),
             categories: splitList(record.categories),
             topics: splitList(record.topics),
-            newsSummary: record.newsSummary,
+            newsSummary: record.newsSummary.isEmpty ? nil : record.newsSummary,
             firstPublishedDate: publishedDate,
             lastUpdatedDate: parseDate(record.lastUpdatedDate, using: formatter),
             newsURL: url

@@ -25,7 +25,6 @@ struct ContentView: View {
             Tab("News", systemImage: "newspaper", value: AppTab.news) {
                 if let feedURL = EMAFeedURLs.news {
                     NewsScreen(feedURL: feedURL, store: newsStore)
-                        .background(Color.blue.opacity(0.08))
                 } else {
                     Text("The News feed URL is unavailable.")
                 }

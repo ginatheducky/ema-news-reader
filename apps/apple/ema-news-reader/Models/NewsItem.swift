@@ -13,7 +13,7 @@ struct NewsItem {
     let relatedMedicineReferral: [String]
     let categories: [String]
     let topics: [String]
-    let newsSummary: String
+    let newsSummary: String?
     let firstPublishedDate: Date
     let lastUpdatedDate: Date?
     let newsURL: URL
