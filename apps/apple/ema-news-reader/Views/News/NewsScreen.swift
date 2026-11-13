@@ -10,12 +10,14 @@ import Foundation
 
 
 struct NewsScreen: View {
+    @State private var filter = NewsFilter()
+    
     let feedURL: URL
     let store: NewsStore
     
     var body: some View {
         if let feed = store.feed {
-            NewsListView(items: feed.items)
+            NewsListView(items: filter.results(from: feed.items))
                 .refreshable {
                     await store.refresh(from: feedURL)
                 }
