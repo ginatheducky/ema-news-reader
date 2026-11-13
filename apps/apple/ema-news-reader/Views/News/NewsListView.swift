@@ -11,7 +11,6 @@ struct NewsListView: View {
     let items: [NewsItem]
     
     var body: some View {
-        NavigationStack {
             Group {
                 if items.isEmpty {
                     // empty state view
@@ -39,7 +38,6 @@ struct NewsListView: View {
             .background {
                 Color("AppBackground").ignoresSafeArea()
             }
-        }
     }
 }
 

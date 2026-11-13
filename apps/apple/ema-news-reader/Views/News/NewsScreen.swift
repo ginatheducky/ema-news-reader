@@ -17,9 +17,22 @@ struct NewsScreen: View {
     
     var body: some View {
         if let feed = store.feed {
-            NewsListView(items: filter.results(from: feed.items))
-                .refreshable {
-                    await store.refresh(from: feedURL)
+            let results = filter.results(from: feed.items)
+            
+            NavigationStack {
+                Group {
+                    if results.isEmpty && !feed.items.isEmpty {
+                        ContentUnavailableView {
+                            Label("No matching news", systemImage: "magnifyingglass")
+                        } description: {
+                            Text("Try another search or clear your category and topic selections.")
+                        }
+                    } else {
+                        NewsListView(items: results)
+                            .refreshable {
+                                await store.refresh(from: feedURL)
+                            }
+                    }
                 }
                 .safeAreaInset(edge: .top, spacing: 0) {
                     if store.lastError != nil {
@@ -36,6 +49,8 @@ struct NewsScreen: View {
                         .background(.regularMaterial)
                     }
                 }
+                .searchable(text: $filter.query, prompt: "Search news")
+            }
         } else if store.isLoading {
             ProgressView("Loading news...")
         } else if store.lastError != nil {
