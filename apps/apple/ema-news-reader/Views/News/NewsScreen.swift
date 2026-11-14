@@ -18,6 +18,8 @@ struct NewsScreen: View {
     var body: some View {
         if let feed = store.feed {
             let results = filter.results(from: feed.items)
+            let availableCategories = NewsFilter.availableCategories(from: feed.items)
+            let availableTopics = NewsFilter.availableTopics(from: feed.items)
             
             NavigationStack {
                 Group {
@@ -50,6 +52,92 @@ struct NewsScreen: View {
                     }
                 }
                 .searchable(text: $filter.query, prompt: "Search news")
+                .toolbar {
+                    // clear all filters button
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Clear all filters") {
+                            filter = NewsFilter()
+                        }
+                    }
+                    
+                    // categories
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button("Clear categories") {
+                                filter.selectedCategories.removeAll()
+                            }
+                            .disabled(filter.selectedCategories.isEmpty)
+                            
+                            Divider()
+                            
+                            Picker("Category matching", selection: $filter.categoryMode) {
+                                Text("Match any").tag(NewsFilter.MatchMode.any)
+                                Text("Match all").tag(NewsFilter.MatchMode.all)
+                            }
+                            
+                            Divider()
+                            
+                            ForEach(availableCategories, id: \.self) { category in
+                                Button {
+                                    if filter.selectedCategories.contains(category) {
+                                        filter.selectedCategories.remove(category)
+                                    } else {
+                                        filter.selectedCategories.insert(category)
+                                    }
+                                } label: {
+                                    let isSelected = filter.selectedCategories.contains(category)
+                                    Label(category, systemImage: isSelected ? "checkmark.circle" : "circle")
+                                }
+                            }
+                        } label: {
+                            FilterMenuLabel(
+                                title: "Categories",
+                                systemImage: "line.3.horizontal.decrease",
+                                selectionCount: filter.selectedCategories.count
+                            )
+                        }
+                        .menuActionDismissBehavior(.disabled)
+                    }
+                    
+                    // topics
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button("Clear topics") {
+                                filter.selectedTopics.removeAll()
+                            }
+                            .disabled(filter.selectedTopics.isEmpty)
+                            
+                            Divider()
+                            
+                            Picker("Topic matching", selection: $filter.topicMode) {
+                                Text("Match any").tag(NewsFilter.MatchMode.any)
+                                Text("Match all").tag(NewsFilter.MatchMode.all)
+                            }
+                            
+                            Divider()
+                            
+                            ForEach(availableTopics, id: \.self) { topic in
+                                Button {
+                                    if filter.selectedTopics.contains(topic) {
+                                        filter.selectedTopics.remove(topic)
+                                    } else {
+                                        filter.selectedTopics.insert(topic)
+                                    }
+                                } label: {
+                                    let isSelected = filter.selectedTopics.contains(topic)
+                                    Label(topic, systemImage: isSelected ? "checkmark.circle" : "circle")
+                                }
+                            }
+                        } label: {
+                            FilterMenuLabel(
+                                title: "Topics",
+                                systemImage: "tag",
+                                selectionCount: filter.selectedTopics.count
+                            )
+                        }
+                        .menuActionDismissBehavior(.disabled)
+                    }
+                }
             }
         } else if store.isLoading {
             ProgressView("Loading news...")

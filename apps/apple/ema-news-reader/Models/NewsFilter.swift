@@ -18,7 +18,20 @@ struct NewsFilter {
     var selectedTopics: Set<String> = []
     var categoryMode: MatchMode = .any
     var topicMode: MatchMode = .any
-
+    
+    static func availableCategories(from items: [NewsItem]) -> [String] {
+        let values = items.flatMap { item in
+            item.categories
+        }
+        return Set(values).sorted()
+    }
+    
+    static func availableTopics(from items: [NewsItem]) -> [String] {
+        let values = items.flatMap { item in
+            item.topics
+        }
+        return Set(values).sorted()
+    }
     
     func matches(_ item: NewsItem) -> Bool {
         let searchMatches = item.matchesSearch(query)
