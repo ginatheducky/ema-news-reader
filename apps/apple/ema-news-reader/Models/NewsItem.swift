@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NewsItem {
+struct NewsItem: Codable {
     let title: String
     let pressRelease: Bool
     let relatedMedicineReferral: [String]
