@@ -8,7 +8,7 @@
 
 
 struct NewsFilter {
-    enum MatchMode {
+    enum MatchMode: String, Codable {
         case any
         case all
     }
@@ -18,6 +18,22 @@ struct NewsFilter {
     var selectedTopics: Set<String> = []
     var categoryMode: MatchMode = .any
     var topicMode: MatchMode = .any
+    
+    var preferences: NewsFilterPreferences {
+        NewsFilterPreferences(
+            selectedCategories: selectedCategories,
+            selectedTopics: selectedTopics,
+            categoryMatchMode: categoryMode,
+            topicMatchMode: topicMode
+        )
+    }
+    
+    mutating func apply(_ preferences: NewsFilterPreferences) {
+        selectedCategories = preferences.selectedCategories
+        selectedTopics = preferences.selectedTopics
+        categoryMode = preferences.categoryMatchMode
+        topicMode = preferences.topicMatchMode
+    }
     
     static func availableCategories(from items: [NewsItem]) -> [String] {
         let values = items.flatMap { item in
