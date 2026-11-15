@@ -11,151 +11,182 @@ import Foundation
 
 struct NewsScreen: View {
     @State private var filter = NewsFilter()
+    @State private var didLoadPreferences = false
+    
+    private let preferencesStore = NewsFilterPreferencesStore()
     
     let feedURL: URL
     let store: NewsStore
     
     var body: some View {
-        if let feed = store.feed {
-            let results = filter.results(from: feed.items)
-            let availableCategories = NewsFilter.availableCategories(from: feed.items)
-            let availableTopics = NewsFilter.availableTopics(from: feed.items)
-            
-            NavigationStack {
-                Group {
-                    if results.isEmpty && !feed.items.isEmpty {
-                        ContentUnavailableView {
-                            Label("No matching news", systemImage: "magnifyingglass")
-                        } description: {
-                            Text("Try another search or clear your category and topic selections.")
-                        }
-                    } else {
-                        NewsListView(items: results)
-                            .refreshable {
-                                await store.refresh(from: feedURL)
+        Group {
+            if let feed = store.feed {
+                let results = filter.results(from: feed.items)
+                let availableCategories = Set(NewsFilter.availableCategories(from: feed.items))
+                    .union(filter.selectedCategories)
+                    .sorted()
+                let availableTopics = Set(NewsFilter.availableTopics(from: feed.items))
+                    .union(filter.selectedTopics)
+                    .sorted()
+                
+                NavigationStack {
+                    Group {
+                        if results.isEmpty && !feed.items.isEmpty {
+                            ContentUnavailableView {
+                                Label("No matching news", systemImage: "magnifyingglass")
+                            } description: {
+                                Text("Try another search or clear your category and topic selections.")
                             }
-                    }
-                }
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    if store.lastError != nil {
-                        HStack {
-                            Text("Couldn't refresh news.")
-                            Spacer()
-                            Button("Retry") {
-                                Task {
+                        } else {
+                            NewsListView(items: results)
+                                .refreshable {
                                     await store.refresh(from: feedURL)
                                 }
-                            }
-                        }
-                        .padding()
-                        .background(.regularMaterial)
-                    }
-                }
-                .searchable(text: $filter.query, prompt: "Search news")
-                .toolbar {
-                    // clear all filters button
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Clear all filters") {
-                            filter = NewsFilter()
                         }
                     }
-                    
-                    // categories
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Menu {
-                            Button("Clear categories") {
-                                filter.selectedCategories.removeAll()
-                            }
-                            .disabled(filter.selectedCategories.isEmpty)
-                            
-                            Divider()
-                            
-                            Picker("Category matching", selection: $filter.categoryMode) {
-                                Text("Match any").tag(NewsFilter.MatchMode.any)
-                                Text("Match all").tag(NewsFilter.MatchMode.all)
-                            }
-                            
-                            Divider()
-                            
-                            ForEach(availableCategories, id: \.self) { category in
-                                Button {
-                                    if filter.selectedCategories.contains(category) {
-                                        filter.selectedCategories.remove(category)
-                                    } else {
-                                        filter.selectedCategories.insert(category)
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        if store.lastError != nil {
+                            HStack {
+                                Text("Couldn't refresh news.")
+                                Spacer()
+                                Button("Retry") {
+                                    Task {
+                                        await store.refresh(from: feedURL)
                                     }
-                                } label: {
-                                    let isSelected = filter.selectedCategories.contains(category)
-                                    Label(category, systemImage: isSelected ? "checkmark.circle" : "circle")
                                 }
                             }
-                        } label: {
-                            FilterMenuLabel(
-                                title: "Categories",
-                                systemImage: "line.3.horizontal.decrease",
-                                selectionCount: filter.selectedCategories.count
-                            )
+                            .padding()
+                            .background(.regularMaterial)
                         }
-                        .menuActionDismissBehavior(.disabled)
                     }
-                    
-                    // topics
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Menu {
-                            Button("Clear topics") {
-                                filter.selectedTopics.removeAll()
+                    .searchable(text: $filter.query, prompt: "Search news")
+                    .toolbar {
+                        // clear all filters button
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Clear all filters") {
+                                filter = NewsFilter()
                             }
-                            .disabled(filter.selectedTopics.isEmpty)
-                            
-                            Divider()
-                            
-                            Picker("Topic matching", selection: $filter.topicMode) {
-                                Text("Match any").tag(NewsFilter.MatchMode.any)
-                                Text("Match all").tag(NewsFilter.MatchMode.all)
-                            }
-                            
-                            Divider()
-                            
-                            ForEach(availableTopics, id: \.self) { topic in
-                                Button {
-                                    if filter.selectedTopics.contains(topic) {
-                                        filter.selectedTopics.remove(topic)
-                                    } else {
-                                        filter.selectedTopics.insert(topic)
-                                    }
-                                } label: {
-                                    let isSelected = filter.selectedTopics.contains(topic)
-                                    Label(topic, systemImage: isSelected ? "checkmark.circle" : "circle")
+                        }
+                        
+                        // categories
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Menu {
+                                Button("Clear categories") {
+                                    filter.selectedCategories.removeAll()
                                 }
+                                .disabled(filter.selectedCategories.isEmpty)
+                                
+                                Divider()
+                                
+                                Picker("Category matching", selection: $filter.categoryMode) {
+                                    Text("Match any").tag(NewsFilter.MatchMode.any)
+                                    Text("Match all").tag(NewsFilter.MatchMode.all)
+                                }
+                                
+                                Divider()
+                                
+                                ForEach(availableCategories, id: \.self) { category in
+                                    Button {
+                                        if filter.selectedCategories.contains(category) {
+                                            filter.selectedCategories.remove(category)
+                                        } else {
+                                            filter.selectedCategories.insert(category)
+                                        }
+                                    } label: {
+                                        let isSelected = filter.selectedCategories.contains(category)
+                                        Label(category, systemImage: isSelected ? "checkmark.circle" : "circle")
+                                    }
+                                }
+                            } label: {
+                                FilterMenuLabel(
+                                    title: "Categories",
+                                    systemImage: "line.3.horizontal.decrease",
+                                    selectionCount: filter.selectedCategories.count
+                                )
                             }
-                        } label: {
-                            FilterMenuLabel(
-                                title: "Topics",
-                                systemImage: "tag",
-                                selectionCount: filter.selectedTopics.count
-                            )
+                            .menuActionDismissBehavior(.disabled)
                         }
-                        .menuActionDismissBehavior(.disabled)
+                        
+                        // topics
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Menu {
+                                Button("Clear topics") {
+                                    filter.selectedTopics.removeAll()
+                                }
+                                .disabled(filter.selectedTopics.isEmpty)
+                                
+                                Divider()
+                                
+                                Picker("Topic matching", selection: $filter.topicMode) {
+                                    Text("Match any").tag(NewsFilter.MatchMode.any)
+                                    Text("Match all").tag(NewsFilter.MatchMode.all)
+                                }
+                                
+                                Divider()
+                                
+                                ForEach(availableTopics, id: \.self) { topic in
+                                    Button {
+                                        if filter.selectedTopics.contains(topic) {
+                                            filter.selectedTopics.remove(topic)
+                                        } else {
+                                            filter.selectedTopics.insert(topic)
+                                        }
+                                    } label: {
+                                        let isSelected = filter.selectedTopics.contains(topic)
+                                        Label(topic, systemImage: isSelected ? "checkmark.circle" : "circle")
+                                    }
+                                }
+                            } label: {
+                                FilterMenuLabel(
+                                    title: "Topics",
+                                    systemImage: "tag",
+                                    selectionCount: filter.selectedTopics.count
+                                )
+                            }
+                            .menuActionDismissBehavior(.disabled)
+                        }
                     }
                 }
-            }
-        } else if store.isLoading {
-            ProgressView("Loading news...")
-        } else if store.lastError != nil {
-            ContentUnavailableView {
-                Label("Couldn't load news.", systemImage: "newspaper")
-            } description: {
-                Text("Check your connection and try again.")
-            } actions: {
-                Button("Retry") {
-                    Task {
-                        await store.refresh(from: feedURL)
+            } else if store.isLoading {
+                ProgressView("Loading news...")
+            } else if store.lastError != nil {
+                ContentUnavailableView {
+                    Label("Couldn't load news.", systemImage: "newspaper")
+                } description: {
+                    Text("Check your connection and try again.")
+                } actions: {
+                    Button("Retry") {
+                        Task {
+                            await store.refresh(from: feedURL)
+                        }
                     }
                 }
+            } else {
+                Text("News has not loaded.")
             }
-        } else {
-            Text("News has not loaded.")
         }
+        .onAppear {
+            guard !didLoadPreferences else { return }
+            didLoadPreferences = true
+            
+            do {
+                if let savedPreferences = try preferencesStore.load() {
+                    filter.apply(savedPreferences)
+                }
+            } catch {
+                print("Could not load news filter preferences: \(error)")
+            }
+        }
+        .onChange(of: filter.preferences) { _, newPreferences in
+            guard didLoadPreferences else { return }
+            
+            do {
+                try preferencesStore.save(newPreferences)
+            } catch {
+                print("Could not save news filter preferences: \(error)")
+            }
+        }
+        
     }
 }
 

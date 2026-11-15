@@ -179,4 +179,26 @@ struct NewsCategoryAndTopicFilterTests {
         
         #expect(titles == ["B", "A", "Older article"])
     }
+    
+    
+    @MainActor
+    @Test func restoresPreferencesWithoutRestoringSearchQuery() throws {
+        var filter = NewsFilter()
+        filter.query = "vaccine"
+        filter.selectedCategories = ["Human"]
+        filter.selectedTopics = ["Safety"]
+        filter.categoryMode = .all
+        
+        let data = try JSONEncoder().encode(filter.preferences)
+        let decoded = try JSONDecoder().decode(NewsFilterPreferences.self, from: data)
+        
+        var restored = NewsFilter()
+        restored.apply(decoded)
+        
+        #expect(filter.selectedCategories == restored.selectedCategories)
+        #expect(filter.selectedTopics == restored.selectedTopics)
+        #expect(filter.categoryMode == restored.categoryMode)
+        #expect(restored.query.isEmpty)
+        
+    }
 }
